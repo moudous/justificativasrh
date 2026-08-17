@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ColaboradorController;
+use App\Services\GiColaboradorSynchronizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
@@ -18,8 +20,11 @@ Route::get('/auth/gi', function (Request $request) {
 
     abort_unless($response->successful(), 401, 'Não foi possível autenticar pelo GI.');
 
+    $contexto = (array) $response->json('data');
+    app(GiColaboradorSynchronizer::class)->sync($contexto);
+
     $request->session()->regenerate();
-    $request->session()->put('gi_context', $response->json('data'));
+    $request->session()->put('gi_context', $contexto);
 
     $destination = (string) $response->json('data.caminho', '/');
     if (! str_starts_with($destination, '/')
@@ -30,6 +35,13 @@ Route::get('/auth/gi', function (Request $request) {
     }
 
     return redirect($destination);
+});
+
+Route::middleware('gi.session')->prefix('colaboradores')->name('colaboradores.')->group(function (): void {
+    Route::get('/', [ColaboradorController::class, 'index'])->middleware('gi.permission:colaboradores.listar')->name('index');
+    Route::get('/{colaborador}', [ColaboradorController::class, 'show'])->middleware('gi.permission:colaboradores.visualizar')->name('show');
+    Route::get('/{colaborador}/edit', [ColaboradorController::class, 'edit'])->middleware('gi.permission:colaboradores.editar')->name('edit');
+    Route::put('/{colaborador}', [ColaboradorController::class, 'update'])->middleware('gi.permission:colaboradores.editar')->name('update');
 });
 
 Route::get('/', function (Request $request) {

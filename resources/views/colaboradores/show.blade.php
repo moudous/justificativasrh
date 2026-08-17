@@ -4,9 +4,9 @@
 
 @section('content')
     @if (session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
-    <div class="mb-4"><h1 class="page-title">Visualizar colaborador</h1><p class="page-description mb-0">Consulte os dados do colaborador.</p></div>
+    <div class="page-header"><div><h1 class="page-title">Visualizar colaborador</h1><p class="page-description">Consulte os dados do colaborador.</p></div></div>
     <div class="card content-card">
-        <div class="card-header"><h2 class="h5 fw-bold mb-0">Dados do colaborador</h2></div>
+        <div class="card-header"><h5>Dados do colaborador</h5></div>
         <div class="card-body">
             @php($campos = [['ID do usuário no GI', $colaborador->id], ['Nome', $colaborador->nome], ['E-mail', $colaborador->email], ['Perfil', $colaborador->perfil], ['ID do perfil', $colaborador->perfil_id], ['Status', $colaborador->ativo ? 'Ativo' : 'Inativo'], ['Data de cadastro', $colaborador->created_at?->format('d/m/Y H:i')], ['Última alteração', $colaborador->updated_at?->format('d/m/Y H:i')]])
             <div class="row g-3">

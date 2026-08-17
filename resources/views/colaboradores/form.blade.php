@@ -3,12 +3,12 @@
 @section('title', 'Editar colaborador')
 
 @section('content')
-    <div class="mb-4"><h1 class="page-title">Editar colaborador</h1><p class="page-description mb-0">Atualize os dados do colaborador.</p></div>
+    <div class="page-header"><div><h1 class="page-title">Editar colaborador</h1><p class="page-description">Atualize os dados do colaborador.</p></div></div>
     <form method="POST" action="{{ route('colaboradores.update', $colaborador) }}">
         @csrf
         @method('PUT')
         <div class="card content-card">
-            <div class="card-header"><h2 class="h5 fw-bold mb-0">Dados do colaborador</h2></div>
+            <div class="card-header"><h5>Dados do colaborador</h5></div>
             <div class="card-body">
                 @if ($errors->any())<div class="alert alert-danger"><ul class="mb-0">@foreach ($errors->all() as $erro)<li>{{ $erro }}</li>@endforeach</ul></div>@endif
                 <div class="row g-3">

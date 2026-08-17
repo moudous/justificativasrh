@@ -48,8 +48,13 @@ Route::get('/gi/{resource}', function (Request $request, string $resource) {
     abort_unless($request->session()->has('gi_context'), 401);
     abort_unless(in_array($resource, ['perfis', 'usuarios'], true), 404);
 
-    return Http::withToken($request->session()->get('gi_context.access_token'))
+    $upstreamResponse = Http::withToken($request->session()->get('gi_context.access_token'))
         ->acceptJson()->timeout(10)
-        ->get(rtrim(env('GI_URL'), '/').'/api/integracoes/v1/'.$resource)
-        ->toResponse($request);
+        ->get(rtrim(env('GI_URL'), '/').'/api/integracoes/v1/'.$resource);
+
+    return response($upstreamResponse->body(), $upstreamResponse->status())
+        ->header(
+            'Content-Type',
+            $upstreamResponse->header('Content-Type') ?? 'application/json',
+        );
 });

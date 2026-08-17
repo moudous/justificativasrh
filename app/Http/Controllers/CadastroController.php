@@ -12,6 +12,7 @@ abstract class CadastroController extends Controller
 {
     protected string $modelClass;
     protected string $recurso;
+    protected string $permissao = '';
     protected string $singular;
     protected string $plural;
 
@@ -111,6 +112,7 @@ abstract class CadastroController extends Controller
     {
         return array_merge([
             'recurso' => $this->recurso,
+            'permissao' => $this->permissao ?: $this->recurso,
             'singular' => $this->singular,
             'plural' => $this->plural,
             'temUnidade' => false,

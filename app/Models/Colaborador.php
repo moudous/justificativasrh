@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Colaborador extends Model
 {
@@ -18,4 +19,9 @@ class Colaborador extends Model
         'ativo' => 'boolean',
         'perfil_id' => 'integer',
     ];
+
+    public function justificativas(): HasMany
+    {
+        return $this->hasMany(Justificativa::class);
+    }
 }

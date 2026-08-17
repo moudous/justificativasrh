@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Categoria extends Model
+class GrauParentesco extends Model
 {
     use SoftDeletes;
+
+    protected $table = 'graus_parentescos';
 
     protected $fillable = ['nome', 'ativo'];
 

@@ -22,6 +22,8 @@
 /storage/*.key
 /storage/app/private/documentos/
 /storage/app/public/documentos/
+/storage/app/justificativas/
+/storage/app/private/justificativas/
 /storage/pail
 /vendor
 /backup/

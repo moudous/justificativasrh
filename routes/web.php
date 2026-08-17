@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ColaboradorController;
 use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\JustificativaController;
+use App\Http\Controllers\GrauParentescoController;
 use App\Http\Controllers\SetorController;
 use App\Http\Controllers\UnidadeController;
 use App\Services\GiColaboradorSynchronizer;
@@ -47,24 +49,38 @@ Route::middleware('gi.session')->prefix('colaboradores')->name('colaboradores.')
     Route::put('/{colaborador}', [ColaboradorController::class, 'update'])->middleware('gi.permission:colaboradores.editar')->name('update');
 });
 
-$registrarCadastro = function (string $uri, string $nome, string $controller): void {
-    Route::middleware('gi.session')->prefix($uri)->name($nome.'.')->group(function () use ($nome, $controller): void {
-        Route::get('/', [$controller, 'index'])->middleware("gi.permission:$nome.listar")->name('index');
-        Route::get('/criar', [$controller, 'create'])->middleware("gi.permission:$nome.criar")->name('create');
-        Route::post('/', [$controller, 'store'])->middleware("gi.permission:$nome.criar")->name('store');
-        Route::patch('/{registro}/restaurar', [$controller, 'restore'])->middleware("gi.permission:$nome.restaurar")->name('restore');
-        Route::delete('/{registro}/excluir-definitivamente', [$controller, 'forceDestroy'])->middleware("gi.permission:$nome.excluir_definitivamente")->name('force-destroy');
-        Route::patch('/{registro}/status', [$controller, 'toggle'])->middleware("gi.permission:$nome.editar")->name('toggle');
-        Route::get('/{registro}', [$controller, 'show'])->middleware("gi.permission:$nome.visualizar")->name('show');
-        Route::get('/{registro}/editar', [$controller, 'edit'])->middleware("gi.permission:$nome.editar")->name('edit');
-        Route::put('/{registro}', [$controller, 'update'])->middleware("gi.permission:$nome.editar")->name('update');
-        Route::delete('/{registro}', [$controller, 'destroy'])->middleware("gi.permission:$nome.excluir")->name('destroy');
+$registrarCadastro = function (string $uri, string $nome, string $controller, ?string $permissao = null): void {
+    $permissao ??= $nome;
+    Route::middleware('gi.session')->prefix($uri)->name($nome.'.')->group(function () use ($nome, $controller, $permissao): void {
+        Route::get('/', [$controller, 'index'])->middleware("gi.permission:$permissao.listar")->name('index');
+        Route::get('/criar', [$controller, 'create'])->middleware("gi.permission:$permissao.criar")->name('create');
+        Route::post('/', [$controller, 'store'])->middleware("gi.permission:$permissao.criar")->name('store');
+        Route::patch('/{registro}/restaurar', [$controller, 'restore'])->middleware("gi.permission:$permissao.restaurar")->name('restore');
+        Route::delete('/{registro}/excluir-definitivamente', [$controller, 'forceDestroy'])->middleware("gi.permission:$permissao.excluir_definitivamente")->name('force-destroy');
+        Route::patch('/{registro}/status', [$controller, 'toggle'])->middleware("gi.permission:$permissao.editar")->name('toggle');
+        Route::get('/{registro}', [$controller, 'show'])->middleware("gi.permission:$permissao.visualizar")->name('show');
+        Route::get('/{registro}/editar', [$controller, 'edit'])->middleware("gi.permission:$permissao.editar")->name('edit');
+        Route::put('/{registro}', [$controller, 'update'])->middleware("gi.permission:$permissao.editar")->name('update');
+        Route::delete('/{registro}', [$controller, 'destroy'])->middleware("gi.permission:$permissao.excluir")->name('destroy');
     });
 };
 
 $registrarCadastro('unidades', 'unidades', UnidadeController::class);
 $registrarCadastro('setores', 'setores', SetorController::class);
 $registrarCadastro('categorias', 'categorias', CategoriaController::class);
+$registrarCadastro('parentescos', 'parentescos', GrauParentescoController::class, 'parentesco');
+
+Route::middleware('gi.session')->prefix('justificativas')->name('justificativas.')->group(function (): void {
+    Route::get('/', [JustificativaController::class, 'index'])->middleware('gi.permission:justificativa.listar')->name('index');
+    Route::get('/criar', [JustificativaController::class, 'create'])->middleware('gi.permission:justificativa.criar')->name('create');
+    Route::post('/', [JustificativaController::class, 'store'])->middleware('gi.permission:justificativa.criar')->name('store');
+    Route::patch('/{justificativa}/restaurar', [JustificativaController::class, 'restore'])->middleware('gi.permission:justificativa.restaurar')->name('restore');
+    Route::delete('/{justificativa}/excluir-definitivamente', [JustificativaController::class, 'forceDestroy'])->middleware('gi.permission:justificativa.excluir_definitivamente')->name('force-destroy');
+    Route::get('/{justificativa}/historico', [JustificativaController::class, 'historico'])->middleware('gi.permission:justificativa.historico')->name('historico');
+    Route::get('/{justificativa}/anexo', [JustificativaController::class, 'anexo'])->middleware('gi.permission:justificativa.visualizar')->name('anexo');
+    Route::get('/{justificativa}', [JustificativaController::class, 'show'])->middleware('gi.permission:justificativa.visualizar')->name('show');
+    Route::delete('/{justificativa}', [JustificativaController::class, 'destroy'])->middleware('gi.permission:justificativa.excluir')->name('destroy');
+});
 
 Route::get('/', function (Request $request) {
     abort_unless($request->session()->has('gi_context'), 401, 'Abra esta aplicação pelo menu do GI.');

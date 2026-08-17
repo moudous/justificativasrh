@@ -1,0 +1,375 @@
+{
+    "schema": "gi.perfis-menus.v1",
+    "exportado_em": "2026-08-17T12:57:36-03:00",
+    "sistema": {
+        "id": 2,
+        "nome": "Sistema de Justificativas do RH",
+        "sigla": "RHJUS"
+    },
+    "perfis": [
+        {
+            "id": 29,
+            "nome": "Chefia",
+            "ativo": true,
+            "permissoes_aplicacoes_externas": [],
+            "menus": [
+                {
+                    "id": 85,
+                    "texto": "Colaboradores",
+                    "icone": "bi bi-people-fill",
+                    "tipo_link": "external_embed",
+                    "classe": null,
+                    "link": "/colaboradores",
+                    "extra": null,
+                    "ativo": true,
+                    "ordem": 1,
+                    "permissoes_externas": [
+                        "colaboradores.listar"
+                    ],
+                    "aplicacao_externa": {
+                        "id": 3,
+                        "nome": "Sistema de Justificativas do RH",
+                        "slug": "justificativasrh"
+                    }
+                },
+                {
+                    "id": 86,
+                    "texto": "Justificativas",
+                    "icone": "bi bi-file-earmark-medical",
+                    "tipo_link": "external_embed",
+                    "classe": null,
+                    "link": "/justificativas",
+                    "extra": null,
+                    "ativo": true,
+                    "ordem": 2,
+                    "permissoes_externas": [
+                        "justificativa.listar"
+                    ],
+                    "aplicacao_externa": {
+                        "id": 3,
+                        "nome": "Sistema de Justificativas do RH",
+                        "slug": "justificativasrh"
+                    }
+                },
+                {
+                    "id": 87,
+                    "texto": "Grau de Parentesco",
+                    "icone": "bi bi-file-earmark-person",
+                    "tipo_link": "external_embed",
+                    "classe": null,
+                    "link": "/parentescos",
+                    "extra": null,
+                    "ativo": true,
+                    "ordem": 3,
+                    "permissoes_externas": [
+                        "parentesco.listar"
+                    ],
+                    "aplicacao_externa": {
+                        "id": 3,
+                        "nome": "Sistema de Justificativas do RH",
+                        "slug": "justificativasrh"
+                    }
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "nome": "Colaborador",
+            "ativo": true,
+            "permissoes_aplicacoes_externas": [],
+            "menus": [
+                {
+                    "id": 83,
+                    "texto": "Colaboradores",
+                    "icone": "bi bi-people-fill",
+                    "tipo_link": "external_embed",
+                    "classe": null,
+                    "link": "/colaboradores",
+                    "extra": null,
+                    "ativo": true,
+                    "ordem": 1,
+                    "permissoes_externas": [
+                        "colaboradores.listar"
+                    ],
+                    "aplicacao_externa": {
+                        "id": 3,
+                        "nome": "Sistema de Justificativas do RH",
+                        "slug": "justificativasrh"
+                    }
+                },
+                {
+                    "id": 84,
+                    "texto": "Justificativas",
+                    "icone": "bi bi-file-earmark-medical",
+                    "tipo_link": "external_embed",
+                    "classe": null,
+                    "link": "/justificativas",
+                    "extra": null,
+                    "ativo": true,
+                    "ordem": 2,
+                    "permissoes_externas": [
+                        "justificativa.listar"
+                    ],
+                    "aplicacao_externa": {
+                        "id": 3,
+                        "nome": "Sistema de Justificativas do RH",
+                        "slug": "justificativasrh"
+                    }
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "nome": "RH",
+            "ativo": true,
+            "permissoes_aplicacoes_externas": [
+                {
+                    "aplicacao_externa": {
+                        "id": 3,
+                        "nome": "Sistema de Justificativas do RH",
+                        "slug": "justificativasrh"
+                    },
+                    "permissoes": [
+                        "colaboradores.listar",
+                        "colaboradores.visualizar",
+                        "colaboradores.setores"
+                    ]
+                }
+            ],
+            "menus": [
+                {
+                    "id": 73,
+                    "texto": "Teste",
+                    "icone": "fa-classic fa-solid fa-bug",
+                    "tipo_link": "external_embed",
+                    "classe": null,
+                    "link": "/",
+                    "extra": null,
+                    "ativo": true,
+                    "ordem": 1,
+                    "permissoes_externas": [],
+                    "aplicacao_externa": {
+                        "id": 3,
+                        "nome": "Sistema de Justificativas do RH",
+                        "slug": "justificativasrh"
+                    }
+                },
+                {
+                    "id": 74,
+                    "texto": "Colaboradores",
+                    "icone": "bi bi-people-fill",
+                    "tipo_link": "external_embed",
+                    "classe": null,
+                    "link": "/colaboradores",
+                    "extra": null,
+                    "ativo": true,
+                    "ordem": 2,
+                    "permissoes_externas": [
+                        "colaboradores.listar"
+                    ],
+                    "aplicacao_externa": {
+                        "id": 3,
+                        "nome": "Sistema de Justificativas do RH",
+                        "slug": "justificativasrh"
+                    }
+                }
+            ]
+        },
+        {
+            "id": 30,
+            "nome": "TI",
+            "ativo": true,
+            "permissoes_aplicacoes_externas": [
+                {
+                    "aplicacao_externa": {
+                        "id": 3,
+                        "nome": "Sistema de Justificativas do RH",
+                        "slug": "justificativasrh"
+                    },
+                    "permissoes": [
+                        "teste.visualizar",
+                        "colaboradores.listar",
+                        "colaboradores.visualizar",
+                        "colaboradores.setores",
+                        "categorias.listar",
+                        "categorias.visualizar",
+                        "categorias.criar",
+                        "categorias.editar",
+                        "categorias.excluir",
+                        "categorias.restaurar",
+                        "categorias.excluir_definitivamente",
+                        "setores.listar",
+                        "setores.visualizar",
+                        "setores.criar",
+                        "setores.editar",
+                        "setores.excluir",
+                        "setores.restaurar",
+                        "setores.excluir_definitivamente",
+                        "unidades.listar",
+                        "unidades.visualizar",
+                        "unidades.criar",
+                        "unidades.excluir",
+                        "unidades.excluir_definitivamente",
+                        "justificativa.listar",
+                        "justificativa.visualizar",
+                        "justificativa.criar",
+                        "justificativa.excluir",
+                        "justificativa.restaurar",
+                        "justificativa.excluir_definitivamente",
+                        "justificativa.historico",
+                        "parentesco.listar",
+                        "parentesco.visualizar",
+                        "parentesco.criar",
+                        "parentesco.editar",
+                        "parentesco.excluir",
+                        "parentesco.excluir_definitivamente",
+                        "parentesco.restaurar",
+                        "cid10_capitulos.listar",
+                        "cid10_capitulos.visualizar",
+                        "cid10_capitulos.criar",
+                        "cid10_capitulos.excluir",
+                        "cid10_capitulos.restaurar",
+                        "cid10_categorias.listar",
+                        "cid10_categorias.visualizar",
+                        "cid10_categorias.editar",
+                        "cid10_categorias.excluir",
+                        "cid10_categorias.restaurar"
+                    ]
+                }
+            ],
+            "menus": [
+                {
+                    "id": 75,
+                    "texto": "Teste",
+                    "icone": "fa-classic fa-solid fa-bug",
+                    "tipo_link": "external_embed",
+                    "classe": null,
+                    "link": "/",
+                    "extra": null,
+                    "ativo": true,
+                    "ordem": 1,
+                    "permissoes_externas": [],
+                    "aplicacao_externa": {
+                        "id": 3,
+                        "nome": "Sistema de Justificativas do RH",
+                        "slug": "justificativasrh"
+                    }
+                },
+                {
+                    "id": 77,
+                    "texto": "Colaboradores",
+                    "icone": "bi bi-people-fill",
+                    "tipo_link": "external_embed",
+                    "classe": null,
+                    "link": "/colaboradores",
+                    "extra": null,
+                    "ativo": true,
+                    "ordem": 2,
+                    "permissoes_externas": [
+                        "colaboradores.listar"
+                    ],
+                    "aplicacao_externa": {
+                        "id": 3,
+                        "nome": "Sistema de Justificativas do RH",
+                        "slug": "justificativasrh"
+                    }
+                },
+                {
+                    "id": 78,
+                    "texto": "Categorias",
+                    "icone": "fa-classic fa-solid fa-tag",
+                    "tipo_link": "external_embed",
+                    "classe": null,
+                    "link": "/categorias",
+                    "extra": null,
+                    "ativo": true,
+                    "ordem": 3,
+                    "permissoes_externas": [
+                        "categorias.listar"
+                    ],
+                    "aplicacao_externa": {
+                        "id": 3,
+                        "nome": "Sistema de Justificativas do RH",
+                        "slug": "justificativasrh"
+                    }
+                },
+                {
+                    "id": 79,
+                    "texto": "Setores",
+                    "icone": "fa-classic fa-solid fa-building-user",
+                    "tipo_link": "external_embed",
+                    "classe": null,
+                    "link": "/setores",
+                    "extra": null,
+                    "ativo": true,
+                    "ordem": 4,
+                    "permissoes_externas": [
+                        "setores.listar"
+                    ],
+                    "aplicacao_externa": {
+                        "id": 3,
+                        "nome": "Sistema de Justificativas do RH",
+                        "slug": "justificativasrh"
+                    }
+                },
+                {
+                    "id": 80,
+                    "texto": "Unidades",
+                    "icone": "fa-classic fa-regular fa-building",
+                    "tipo_link": "external_embed",
+                    "classe": null,
+                    "link": "/unidades",
+                    "extra": null,
+                    "ativo": true,
+                    "ordem": 5,
+                    "permissoes_externas": [
+                        "unidades.listar"
+                    ],
+                    "aplicacao_externa": {
+                        "id": 3,
+                        "nome": "Sistema de Justificativas do RH",
+                        "slug": "justificativasrh"
+                    }
+                },
+                {
+                    "id": 81,
+                    "texto": "Justificativas",
+                    "icone": "bi bi-file-earmark-medical",
+                    "tipo_link": "external_embed",
+                    "classe": null,
+                    "link": "/justificativas",
+                    "extra": null,
+                    "ativo": true,
+                    "ordem": 6,
+                    "permissoes_externas": [
+                        "justificativa.listar"
+                    ],
+                    "aplicacao_externa": {
+                        "id": 3,
+                        "nome": "Sistema de Justificativas do RH",
+                        "slug": "justificativasrh"
+                    }
+                },
+                {
+                    "id": 82,
+                    "texto": "Grau de Parentesco",
+                    "icone": "bi bi-file-earmark-person",
+                    "tipo_link": "external_embed",
+                    "classe": null,
+                    "link": "/parentescos",
+                    "extra": null,
+                    "ativo": true,
+                    "ordem": 7,
+                    "permissoes_externas": [
+                        "parentesco.listar"
+                    ],
+                    "aplicacao_externa": {
+                        "id": 3,
+                        "nome": "Sistema de Justificativas do RH",
+                        "slug": "justificativasrh"
+                    }
+                }
+            ]
+        }
+    ]
+}

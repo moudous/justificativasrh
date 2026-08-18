@@ -99,7 +99,7 @@ class ResponsavelController extends Controller
 
     public function pesquisarColaboradores(Request $request, GiPermissionService $permissoes): JsonResponse
     {
-        abort_unless($permissoes->permite('responsaveis.criar', $request) || $permissoes->permite('responsavel.editar', $request), 403);
+        abort_unless($permissoes->permite('responsaveis.criar', $request) || $permissoes->permite('responsaveis.editar', $request), 403);
         $termo = trim((string) $request->input('q', ''));
         $query = Colaborador::query()->where('ativo', true)->orderBy('nome');
         if ($termo !== '') $query->where(fn ($filtro) => $filtro->where('nome', 'like', '%'.$termo.'%')->orWhere('email', 'like', '%'.$termo.'%'));

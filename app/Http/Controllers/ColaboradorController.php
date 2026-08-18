@@ -17,8 +17,20 @@ class ColaboradorController extends Controller
     public function index(Request $request, DataTableServer $dataTable): View|JsonResponse
     {
         if ($request->ajax()) {
-            return $dataTable->response($request, Colaborador::query(), ['id', 'nome', 'email', 'perfil', 'perfil_id', 'ativo', 'updated_at', null], fn ($registro) => [
-                'id' => $registro->id, 'nome' => $registro->nome, 'email' => $registro->email, 'perfil' => $registro->perfil, 'perfil_id' => $registro->perfil_id,
+            $query = Colaborador::query()
+                ->select('colaboradores.*')
+                ->with(['setor', 'responsavel.colaborador'])
+                ->leftJoin('setores', function ($join): void {
+                    $join->on('setores.id', '=', 'colaboradores.setor_id')->whereNull('setores.deleted_at');
+                })
+                ->leftJoin('responsaveis', function ($join): void {
+                    $join->on('responsaveis.id', '=', 'colaboradores.responsavel_id')->whereNull('responsaveis.deleted_at');
+                })
+                ->leftJoin('colaboradores as responsavel_colaborador', 'responsavel_colaborador.id', '=', 'responsaveis.colaborador_id');
+
+            return $dataTable->response($request, $query, ['colaboradores.id', 'colaboradores.nome', 'colaboradores.email', 'colaboradores.perfil', 'setores.nome', 'responsavel_colaborador.nome', 'colaboradores.ativo', 'colaboradores.updated_at', null], fn ($registro) => [
+                'id' => $registro->id, 'nome' => $registro->nome, 'email' => $registro->email, 'perfil' => $registro->perfil,
+                'setor' => $registro->setor?->nome ?? '—', 'responsavel' => $registro->responsavel?->colaborador?->nome ?? '—',
                 'situacao' => view('components.situacao', compact('registro'))->render(), 'atualizado_em' => $registro->updated_at?->format('d/m/Y H:i') ?? '—',
                 'acoes' => view('components.colaborador-actions', ['colaborador' => $registro])->render(),
             ]);

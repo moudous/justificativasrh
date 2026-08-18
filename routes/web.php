@@ -131,8 +131,8 @@ Route::middleware('gi.session')->prefix('responsaveis')->name('responsaveis.')->
     Route::patch('/{responsavel}/restaurar', [ResponsavelController::class, 'restore'])->middleware('gi.permission:responsaveis.restaurar')->name('restore');
     Route::delete('/{responsavel}/excluir-definitivamente', [ResponsavelController::class, 'forceDestroy'])->middleware('gi.permission:responsaveis.excluir_definitivamente')->name('force-destroy');
     Route::get('/{responsavel}', [ResponsavelController::class, 'show'])->middleware('gi.permission:responsaveis.visualizar')->name('show');
-    Route::get('/{responsavel}/editar', [ResponsavelController::class, 'edit'])->middleware('gi.permission:responsavel.editar')->name('edit');
-    Route::put('/{responsavel}', [ResponsavelController::class, 'update'])->middleware('gi.permission:responsavel.editar')->name('update');
+    Route::get('/{responsavel}/editar', [ResponsavelController::class, 'edit'])->middleware('gi.permission:responsaveis.editar')->name('edit');
+    Route::put('/{responsavel}', [ResponsavelController::class, 'update'])->middleware('gi.permission:responsaveis.editar')->name('update');
     Route::delete('/{responsavel}', [ResponsavelController::class, 'destroy'])->middleware('gi.permission:responsaveis.excluir')->name('destroy');
 });
 

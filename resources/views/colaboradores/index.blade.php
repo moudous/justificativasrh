@@ -21,7 +21,7 @@
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table id="colaboradoresTable" class="table table-hover align-middle w-100">
-                    <thead><tr><th>ID GI</th><th>Nome</th><th>E-mail</th><th>Perfil</th><th>ID perfil</th><th>Status</th><th>Última sincronização</th><th class="text-center" data-dt-order="disable">Ações</th></tr></thead>
+                    <thead><tr><th>ID GI</th><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Setor</th><th>Responsável</th><th>Status</th><th>Última sincronização</th><th class="text-center" data-dt-order="disable">Ações</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
@@ -34,10 +34,10 @@
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => new DataTable('#colaboradoresTable', { processing: true, serverSide: true, ajax: '{{ route('colaboradores.index') }}', columns: [{data:'id'},{data:'nome'},{data:'email'},{data:'perfil'},{data:'perfil_id'},{data:'situacao'},{data:'atualizado_em'},{data:'acoes'}],
+        document.addEventListener('DOMContentLoaded', () => new DataTable('#colaboradoresTable', { processing: true, serverSide: true, ajax: '{{ route('colaboradores.index') }}', columns: [{data:'id'},{data:'nome'},{data:'email'},{data:'perfil'},{data:'setor'},{data:'responsavel'},{data:'situacao'},{data:'atualizado_em'},{data:'acoes'}],
             columnDefs: [
-                { targets: [0, 4, 5, 6], className: 'text-nowrap' },
-                { targets: 7, orderable: false, searchable: false, className: 'text-center text-nowrap' }
+                { targets: [0, 6, 7], className: 'text-nowrap' },
+                { targets: 8, orderable: false, searchable: false, className: 'text-center text-nowrap' }
             ],
             order: [[1, 'asc']],
             paging: true,

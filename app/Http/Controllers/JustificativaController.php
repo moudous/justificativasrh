@@ -23,26 +23,19 @@ class JustificativaController extends Controller
     public function index(Request $request, DataTableServer $dataTable): View|JsonResponse
     {
         if ($request->ajax()) {
-            $podeVerInformacoesMedicas = app(GiPermissionService::class)->permite('justificativa.info_medicas', $request);
-            $query = Justificativa::query()->with(['categoria', 'grauParentesco'])->withTrashed()
+            $query = Justificativa::query()->with('categoria')->withTrashed()
                 ->leftJoin('categorias', 'categorias.id', '=', 'justificativas.categoria_id')
-                ->leftJoin('graus_parentescos', 'graus_parentescos.id', '=', 'justificativas.grau_parentesco_id')->select('justificativas.*');
-            $columns = ['justificativas.id', 'justificativas.descricao', 'categorias.nome', 'justificativas.status'];
-            if ($podeVerInformacoesMedicas) array_push($columns, 'justificativas.crm_medico', 'justificativas.cid', 'justificativas.tipo_atestado', 'graus_parentescos.nome');
-            array_push($columns, 'justificativas.updated_at', null);
-            return $dataTable->response($request, $query, $columns, function ($registro) use ($podeVerInformacoesMedicas): array {
-                $data = [
+                ->select('justificativas.*');
+            $columns = ['justificativas.id', 'justificativas.descricao', 'categorias.nome', 'justificativas.status', 'justificativas.updated_at', null];
+
+            return $dataTable->response($request, $query, $columns, fn ($registro): array => [
                 'id' => $registro->id,
                 'descricao' => e(\Illuminate\Support\Str::limit($registro->descricao, 90)).($registro->trashed() ? ' <span class="badge text-bg-danger">Excluída</span>' : ''),
                 'categoria' => $registro->categoria?->nome ?? '—',
                 'situacao' => '<span class="badge text-bg-info">'.e($registro->status).'</span>',
-                ];
-                if ($podeVerInformacoesMedicas) {
-                    $data += ['crm' => $registro->crm_medico ?? '—', 'cid' => $registro->cid ?? '—', 'tipo_atestado' => match ($registro->tipo_atestado) {'proprio' => 'Próprio', 'acompanhamento' => 'Acompanhamento', default => '—'}, 'grau_parentesco' => $registro->grauParentesco?->nome ?? '—'];
-                }
-                $data += ['atualizado_em' => $registro->updated_at?->format('d/m/Y H:i') ?? '—', 'acoes' => view('components.justificativa-actions', ['justificativa' => $registro])->render()];
-                return $data;
-            });
+                'atualizado_em' => $registro->updated_at?->format('d/m/Y H:i') ?? '—',
+                'acoes' => view('components.justificativa-actions', ['justificativa' => $registro])->render(),
+            ]);
         }
         return view('justificativas.index', [
             'colaboradorLogado' => $this->colaboradorLogado($request),

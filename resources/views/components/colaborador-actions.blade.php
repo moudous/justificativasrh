@@ -1,1 +1,19 @@
-<div class="d-inline-flex gap-1">@if($giPermissoes->permite('colaboradores.visualizar'))<a href="{{ route('colaboradores.show', $colaborador) }}" class="btn btn-sm btn-outline-dark listagem-acao" title="Visualizar colaborador"><i class="bi bi-eye-fill"></i></a>@endif @if($giPermissoes->permite('colaboradores.editar'))<a href="{{ route('colaboradores.edit', $colaborador) }}" class="btn btn-sm btn-outline-primary listagem-acao" title="Editar colaborador"><i class="bi bi-pencil-fill"></i></a>@endif</div>
+<div class="d-inline-flex gap-1">
+    @if ($giPermissoes->permite('colaboradores.visualizar'))
+        <a href="{{ route('colaboradores.show', $colaborador) }}"
+           class="btn btn-sm btn-outline-dark listagem-acao"
+           title="Visualizar colaborador"
+           aria-label="Visualizar colaborador">
+            <i class="bi bi-eye-fill"></i>
+        </a>
+    @endif
+
+    @if ($giPermissoes->permite('colaboradores.editar'))
+        <a href="{{ route('colaboradores.edit', $colaborador) }}"
+           class="btn btn-sm btn-outline-primary listagem-acao"
+           title="Editar colaborador"
+           aria-label="Editar colaborador">
+            <i class="bi bi-pencil-fill"></i>
+        </a>
+    @endif
+</div>

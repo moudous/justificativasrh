@@ -22,9 +22,9 @@ class ResponsavelController extends Controller
             $query = Responsavel::query()->with(['colaborador', 'setores'])->withTrashed()
                 ->leftJoin('colaboradores', 'colaboradores.id', '=', 'responsaveis.colaborador_id')->select('responsaveis.*');
 
-            return $dataTable->response($request, $query, ['responsaveis.id', 'responsaveis.nome', 'responsaveis.cargo', 'colaboradores.nome', null, 'responsaveis.updated_at', null], fn (Responsavel $registro) => [
+            return $dataTable->response($request, $query, ['responsaveis.id', 'colaboradores.nome', 'responsaveis.cargo', 'colaboradores.nome', null, 'responsaveis.updated_at', null], fn (Responsavel $registro) => [
                 'id' => $registro->id,
-                'nome' => e($registro->nome).($registro->trashed() ? ' <span class="badge text-bg-danger">Excluído</span>' : ''),
+                'nome' => e($registro->colaborador?->nome ?? '—').($registro->trashed() ? ' <span class="badge text-bg-danger">Excluído</span>' : ''),
                 'cargo' => $registro->cargo,
                 'colaborador' => $registro->colaborador?->nome ?? '—',
                 'setores' => $registro->setores->pluck('nome')->join(', ') ?: '—',
@@ -99,7 +99,7 @@ class ResponsavelController extends Controller
 
     public function pesquisarColaboradores(Request $request, GiPermissionService $permissoes): JsonResponse
     {
-        abort_unless($permissoes->permite('responsaveis.criar', $request) || $permissoes->permite('responsaveis.editar', $request), 403);
+        abort_unless($permissoes->permite('responsaveis.criar', $request) || $permissoes->permite('responsavel.editar', $request), 403);
         $termo = trim((string) $request->input('q', ''));
         $query = Colaborador::query()->where('ativo', true)->orderBy('nome');
         if ($termo !== '') $query->where(fn ($filtro) => $filtro->where('nome', 'like', '%'.$termo.'%')->orWhere('email', 'like', '%'.$termo.'%'));
@@ -119,7 +119,6 @@ class ResponsavelController extends Controller
     private function rules(?Responsavel $responsavel = null): array
     {
         return [
-            'nome' => ['required', 'string', 'max:255'],
             'cargo' => ['required', 'string', 'max:255'],
             'colaborador_id' => ['required', 'integer', Rule::exists('colaboradores', 'id'), Rule::unique('responsaveis', 'colaborador_id')->ignore($responsavel?->id)],
             'setores' => ['required', 'array', 'min:1'],

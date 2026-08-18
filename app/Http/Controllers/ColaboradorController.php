@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Colaborador;
+use App\Models\Responsavel;
+use App\Models\Setor;
 use App\Services\DataTableServer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -31,18 +33,39 @@ class ColaboradorController extends Controller
 
     public function edit(Colaborador $colaborador): View
     {
-        return view('colaboradores.form', compact('colaborador'));
+        return view('colaboradores.form', [
+            'colaborador' => $colaborador->load(['setor', 'responsavel.colaborador']),
+            'setores' => Setor::query()->where('ativo', true)->orderBy('nome')->get(),
+            'responsaveis' => Responsavel::query()
+                ->with(['colaborador', 'setores' => fn ($query) => $query->where('setores.ativo', true)])
+                ->whereHas('colaborador', fn ($query) => $query->where('ativo', true))
+                ->orderBy('id')
+                ->get(),
+        ]);
     }
 
     public function update(Request $request, Colaborador $colaborador): RedirectResponse
     {
-        $dados = $request->validate([
-            'nome' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('colaboradores')->ignore($colaborador->id)],
-            'perfil' => ['required', 'string', 'max:255'],
-            'perfil_id' => ['required', 'integer', 'min:1'],
+        $regras = [
             'ativo' => ['required', 'boolean'],
-        ]);
+            'setor_id' => ['nullable', 'integer', Rule::exists('setores', 'id')->where(fn ($query) => $query->where('ativo', true)->whereNull('deleted_at'))],
+            'responsavel_id' => ['nullable', 'integer', Rule::exists('responsaveis', 'id')->where(fn ($query) => $query->whereNull('deleted_at'))],
+        ];
+
+        $dados = $request->validate($regras);
+
+        if (empty($dados['setor_id']) && ! empty($dados['responsavel_id'])) {
+            $setoresDoResponsavel = Responsavel::query()
+                ->findOrFail($dados['responsavel_id'])
+                ->setores()
+                ->where('setores.ativo', true)
+                ->limit(2)
+                ->pluck('setores.id');
+
+            if ($setoresDoResponsavel->count() === 1) {
+                $dados['setor_id'] = $setoresDoResponsavel->first();
+            }
+        }
 
         $colaborador->update($dados);
 

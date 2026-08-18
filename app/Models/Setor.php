@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Setor extends Model
@@ -19,5 +20,10 @@ class Setor extends Model
     public function unidade(): BelongsTo
     {
         return $this->belongsTo(Unidade::class)->withTrashed();
+    }
+
+    public function responsaveis(): BelongsToMany
+    {
+        return $this->belongsToMany(Responsavel::class, 'responsavel_setor');
     }
 }

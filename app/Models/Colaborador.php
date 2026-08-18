@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Colaborador extends Model
 {
@@ -23,5 +24,10 @@ class Colaborador extends Model
     public function justificativas(): HasMany
     {
         return $this->hasMany(Justificativa::class);
+    }
+
+    public function responsavel(): HasOne
+    {
+        return $this->hasOne(Responsavel::class);
     }
 }

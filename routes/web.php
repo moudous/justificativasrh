@@ -6,6 +6,7 @@ use App\Http\Controllers\Cid10CapituloController;
 use App\Http\Controllers\Cid10CategoriaController;
 use App\Http\Controllers\Cid10GrupoController;
 use App\Http\Controllers\Cid10SubcategoriaController;
+use App\Http\Controllers\ResponsavelController;
 use App\Http\Controllers\JustificativaController;
 use App\Http\Controllers\GrauParentescoController;
 use App\Http\Controllers\SetorController;
@@ -120,6 +121,19 @@ Route::middleware('gi.session')->prefix('cid10_subcategorias')->name('cid10_subc
     Route::get('/{subcategoria}/editar', [Cid10SubcategoriaController::class, 'edit'])->middleware('gi.permission:cid10_subcategorias.editar')->name('edit');
     Route::put('/{subcategoria}', [Cid10SubcategoriaController::class, 'update'])->middleware('gi.permission:cid10_subcategorias.editar')->name('update');
     Route::delete('/{subcategoria}', [Cid10SubcategoriaController::class, 'destroy'])->middleware('gi.permission:cid10_subcategorias.excluir')->name('destroy');
+});
+
+Route::middleware('gi.session')->prefix('responsaveis')->name('responsaveis.')->group(function (): void {
+    Route::get('/', [ResponsavelController::class, 'index'])->middleware('gi.permission:responsaveis.listar')->name('index');
+    Route::get('/colaboradores/pesquisar', [ResponsavelController::class, 'pesquisarColaboradores'])->name('colaboradores.search');
+    Route::get('/criar', [ResponsavelController::class, 'create'])->middleware('gi.permission:responsaveis.criar')->name('create');
+    Route::post('/', [ResponsavelController::class, 'store'])->middleware('gi.permission:responsaveis.criar')->name('store');
+    Route::patch('/{responsavel}/restaurar', [ResponsavelController::class, 'restore'])->middleware('gi.permission:responsaveis.restaurar')->name('restore');
+    Route::delete('/{responsavel}/excluir-definitivamente', [ResponsavelController::class, 'forceDestroy'])->middleware('gi.permission:responsaveis.excluir_definitivamente')->name('force-destroy');
+    Route::get('/{responsavel}', [ResponsavelController::class, 'show'])->middleware('gi.permission:responsaveis.visualizar')->name('show');
+    Route::get('/{responsavel}/editar', [ResponsavelController::class, 'edit'])->middleware('gi.permission:responsaveis.editar')->name('edit');
+    Route::put('/{responsavel}', [ResponsavelController::class, 'update'])->middleware('gi.permission:responsaveis.editar')->name('update');
+    Route::delete('/{responsavel}', [ResponsavelController::class, 'destroy'])->middleware('gi.permission:responsaveis.excluir')->name('destroy');
 });
 
 Route::middleware('gi.session')->prefix('justificativas')->name('justificativas.')->group(function (): void {

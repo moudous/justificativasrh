@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Storage;
 
 class Justificativa extends Model
 {
@@ -23,6 +22,8 @@ class Justificativa extends Model
         'anexo_nome_original',
         'anexo_mime',
         'atestado_medico',
+        'crm_medico',
+        'cid',
         'tipo_atestado',
         'grau_parentesco_id',
     ];
@@ -53,10 +54,8 @@ class Justificativa extends Model
             ]);
         });
 
-        static::forceDeleted(function (Justificativa $justificativa): void {
-            if ($justificativa->anexo_caminho) {
-                Storage::disk('local')->delete($justificativa->anexo_caminho);
-            }
+        static::forceDeleting(function (Justificativa $justificativa): void {
+            $justificativa->anexos()->get()->each->delete();
         });
     }
 
@@ -73,6 +72,11 @@ class Justificativa extends Model
     public function historicos(): HasMany
     {
         return $this->hasMany(JustificativaHistorico::class);
+    }
+
+    public function anexos(): HasMany
+    {
+        return $this->hasMany(JustificativaAnexo::class);
     }
 
     public function grauParentesco(): BelongsTo

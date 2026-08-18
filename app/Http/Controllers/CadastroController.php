@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\DataTableServer;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -16,11 +18,25 @@ abstract class CadastroController extends Controller
     protected string $singular;
     protected string $plural;
 
-    public function index(): View
+    public function index(Request $request, DataTableServer $dataTable): View|JsonResponse
     {
-        return view('cadastros.index', $this->viewData([
-            'registros' => $this->indexQuery()->withTrashed()->orderBy('nome')->get(),
-        ]));
+        if ($request->ajax()) {
+            $temUnidade = $this instanceof SetorController;
+            $columns = $temUnidade ? ['id', 'nome', null, 'ativo', 'updated_at', null] : ['id', 'nome', 'ativo', 'updated_at', null];
+            return $dataTable->response($request, $this->indexQuery()->withTrashed(), $columns, function ($registro) use ($temUnidade): array {
+                $data = ['id' => $registro->id, 'nome' => e($registro->nome).($registro->trashed() ? ' <span class="badge text-bg-danger">Excluído</span>' : '')];
+                if ($temUnidade) $data['unidade'] = $registro->unidade?->nome ?? '—';
+                $data['situacao'] = view('components.situacao', compact('registro'))->render();
+                $data['atualizado_em'] = $registro->updated_at?->format('d/m/Y H:i') ?? '—';
+                $data['acoes'] = view('components.cadastro-actions', [
+                    'registro' => $registro,
+                    'recurso' => $this->recurso,
+                    'permissao' => $this->permissao ?: $this->recurso,
+                ])->render();
+                return $data;
+            });
+        }
+        return view('cadastros.index', $this->viewData());
     }
 
     public function create(): View

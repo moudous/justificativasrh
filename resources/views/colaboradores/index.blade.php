@@ -22,29 +22,7 @@
             <div class="table-responsive">
                 <table id="colaboradoresTable" class="table table-hover align-middle w-100">
                     <thead><tr><th>ID GI</th><th>Nome</th><th>E-mail</th><th>Perfil</th><th>ID perfil</th><th>Status</th><th>Última sincronização</th><th class="text-center" data-dt-order="disable">Ações</th></tr></thead>
-                    <tbody>
-                    @foreach ($colaboradores as $colaborador)
-                        <tr>
-                            <td>{{ $colaborador->id }}</td>
-                            <td>{{ $colaborador->nome }}</td>
-                            <td>{{ $colaborador->email }}</td>
-                            <td>{{ $colaborador->perfil }}</td>
-                            <td>{{ $colaborador->perfil_id }}</td>
-                            <td><span class="badge {{ $colaborador->ativo ? 'text-bg-success' : 'text-bg-secondary' }}">{{ $colaborador->ativo ? 'Ativo' : 'Inativo' }}</span></td>
-                            <td class="text-nowrap">{{ $colaborador->updated_at?->format('d/m/Y H:i') ?? '—' }}</td>
-                            <td class="text-center text-nowrap">
-                                <div class="d-inline-flex gap-1">
-                                    @if ($giPermissoes->permite('colaboradores.visualizar'))
-                                        <a href="{{ route('colaboradores.show', $colaborador) }}" class="btn btn-sm btn-outline-dark listagem-acao" title="Visualizar colaborador" aria-label="Visualizar {{ $colaborador->nome }}"><i class="bi bi-eye-fill"></i></a>
-                                    @endif
-                                    @if ($giPermissoes->permite('colaboradores.editar'))
-                                        <a href="{{ route('colaboradores.edit', $colaborador) }}" class="btn btn-sm btn-outline-primary listagem-acao" title="Editar colaborador" aria-label="Editar {{ $colaborador->nome }}"><i class="bi bi-pencil-fill"></i></a>
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
@@ -56,13 +34,15 @@
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => new DataTable('#colaboradoresTable', {
+        document.addEventListener('DOMContentLoaded', () => new DataTable('#colaboradoresTable', { processing: true, serverSide: true, ajax: '{{ route('colaboradores.index') }}', columns: [{data:'id'},{data:'nome'},{data:'email'},{data:'perfil'},{data:'perfil_id'},{data:'situacao'},{data:'atualizado_em'},{data:'acoes'}],
             columnDefs: [
                 { targets: [0, 4, 5, 6], className: 'text-nowrap' },
                 { targets: 7, orderable: false, searchable: false, className: 'text-center text-nowrap' }
             ],
             order: [[1, 'asc']],
+            paging: true,
             pageLength: 10,
+            lengthMenu: [10],
             language: {
                 emptyTable: 'Nenhum colaborador cadastrado.', info: 'Exibindo _START_ a _END_ de _TOTAL_ colaboradores',
                 infoEmpty: 'Nenhum colaborador encontrado', infoFiltered: '(filtrado de _MAX_ colaboradores)',

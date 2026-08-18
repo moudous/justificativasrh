@@ -2,6 +2,10 @@
 
 use App\Http\Controllers\ColaboradorController;
 use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\Cid10CapituloController;
+use App\Http\Controllers\Cid10CategoriaController;
+use App\Http\Controllers\Cid10GrupoController;
+use App\Http\Controllers\Cid10SubcategoriaController;
 use App\Http\Controllers\JustificativaController;
 use App\Http\Controllers\GrauParentescoController;
 use App\Http\Controllers\SetorController;
@@ -70,14 +74,66 @@ $registrarCadastro('setores', 'setores', SetorController::class);
 $registrarCadastro('categorias', 'categorias', CategoriaController::class);
 $registrarCadastro('parentescos', 'parentescos', GrauParentescoController::class, 'parentesco');
 
+Route::middleware('gi.session')->prefix('cid10_capitulos')->name('cid10_capitulos.')->group(function (): void {
+    Route::get('/', [Cid10CapituloController::class, 'index'])->middleware('gi.permission:cid10_capitulos.listar')->name('index');
+    Route::get('/criar', [Cid10CapituloController::class, 'create'])->middleware('gi.permission:cid10_capitulos.criar')->name('create');
+    Route::post('/', [Cid10CapituloController::class, 'store'])->middleware('gi.permission:cid10_capitulos.criar')->name('store');
+    Route::patch('/{capitulo}/restaurar', [Cid10CapituloController::class, 'restore'])->middleware('gi.permission:cid10_capitulos.restaurar')->name('restore');
+    Route::patch('/{capitulo}/status', [Cid10CapituloController::class, 'toggle'])->middleware('gi.permission:cid10_capitulos.editar')->name('toggle');
+    Route::get('/{capitulo}', [Cid10CapituloController::class, 'show'])->middleware('gi.permission:cid10_capitulos.visualizar')->name('show');
+    Route::get('/{capitulo}/editar', [Cid10CapituloController::class, 'edit'])->middleware('gi.permission:cid10_capitulos.editar')->name('edit');
+    Route::put('/{capitulo}', [Cid10CapituloController::class, 'update'])->middleware('gi.permission:cid10_capitulos.editar')->name('update');
+    Route::delete('/{capitulo}', [Cid10CapituloController::class, 'destroy'])->middleware('gi.permission:cid10_capitulos.excluir')->name('destroy');
+});
+
+Route::middleware('gi.session')->prefix('cid10_categorias')->name('cid10_categorias.')->group(function (): void {
+    Route::get('/', [Cid10CategoriaController::class, 'index'])->middleware('gi.permission:cid10_categorias.listar')->name('index');
+    Route::get('/criar', [Cid10CategoriaController::class, 'create'])->middleware('gi.permission:cid10_categorias.criar')->name('create');
+    Route::post('/', [Cid10CategoriaController::class, 'store'])->middleware('gi.permission:cid10_categorias.criar')->name('store');
+    Route::patch('/{categoriaCid}/restaurar', [Cid10CategoriaController::class, 'restore'])->middleware('gi.permission:cid10_categorias.restaurar')->name('restore');
+    Route::patch('/{categoriaCid}/status', [Cid10CategoriaController::class, 'toggle'])->middleware('gi.permission:cid10_categorias.editar')->name('toggle');
+    Route::get('/{categoriaCid}', [Cid10CategoriaController::class, 'show'])->middleware('gi.permission:cid10_categorias.visualizar')->name('show');
+    Route::get('/{categoriaCid}/editar', [Cid10CategoriaController::class, 'edit'])->middleware('gi.permission:cid10_categorias.editar')->name('edit');
+    Route::put('/{categoriaCid}', [Cid10CategoriaController::class, 'update'])->middleware('gi.permission:cid10_categorias.editar')->name('update');
+    Route::delete('/{categoriaCid}', [Cid10CategoriaController::class, 'destroy'])->middleware('gi.permission:cid10_categorias.excluir')->name('destroy');
+});
+
+Route::middleware('gi.session')->prefix('cid10_grupos')->name('cid10_grupos.')->group(function (): void {
+    Route::get('/', [Cid10GrupoController::class, 'index'])->middleware('gi.permission:cid10_grupos.listar')->name('index');
+    Route::get('/criar', [Cid10GrupoController::class, 'create'])->middleware('gi.permission:cid10_grupos.criar')->name('create');
+    Route::post('/', [Cid10GrupoController::class, 'store'])->middleware('gi.permission:cid10_grupos.criar')->name('store');
+    Route::patch('/{grupo}/restaurar', [Cid10GrupoController::class, 'restore'])->middleware('gi.permission:cid10_grupos.restaurar')->name('restore');
+    Route::patch('/{grupo}/status', [Cid10GrupoController::class, 'toggle'])->middleware('gi.permission:cid10_grupos.editar')->name('toggle');
+    Route::get('/{grupo}', [Cid10GrupoController::class, 'show'])->middleware('gi.permission:cid10_grupos.visualizar')->name('show');
+    Route::get('/{grupo}/editar', [Cid10GrupoController::class, 'edit'])->middleware('gi.permission:cid10_grupos.editar')->name('edit');
+    Route::put('/{grupo}', [Cid10GrupoController::class, 'update'])->middleware('gi.permission:cid10_grupos.editar')->name('update');
+    Route::delete('/{grupo}', [Cid10GrupoController::class, 'destroy'])->middleware('gi.permission:cid10_grupos.excluir')->name('destroy');
+});
+
+Route::middleware('gi.session')->prefix('cid10_subcategorias')->name('cid10_subcategorias.')->group(function (): void {
+    Route::get('/', [Cid10SubcategoriaController::class, 'index'])->middleware('gi.permission:cid10_subcategorias.listar')->name('index');
+    Route::get('/criar', [Cid10SubcategoriaController::class, 'create'])->middleware('gi.permission:cid10_subcategorias.criar')->name('create');
+    Route::post('/', [Cid10SubcategoriaController::class, 'store'])->middleware('gi.permission:cid10_subcategorias.criar')->name('store');
+    Route::patch('/{subcategoria}/restaurar', [Cid10SubcategoriaController::class, 'restore'])->middleware('gi.permission:cid10_subcategorias.restaurar')->name('restore');
+    Route::patch('/{subcategoria}/status', [Cid10SubcategoriaController::class, 'toggle'])->middleware('gi.permission:cid10_subcategorias.editar')->name('toggle');
+    Route::get('/{subcategoria}', [Cid10SubcategoriaController::class, 'show'])->middleware('gi.permission:cid10_subcategorias.visualizar')->name('show');
+    Route::get('/{subcategoria}/editar', [Cid10SubcategoriaController::class, 'edit'])->middleware('gi.permission:cid10_subcategorias.editar')->name('edit');
+    Route::put('/{subcategoria}', [Cid10SubcategoriaController::class, 'update'])->middleware('gi.permission:cid10_subcategorias.editar')->name('update');
+    Route::delete('/{subcategoria}', [Cid10SubcategoriaController::class, 'destroy'])->middleware('gi.permission:cid10_subcategorias.excluir')->name('destroy');
+});
+
 Route::middleware('gi.session')->prefix('justificativas')->name('justificativas.')->group(function (): void {
     Route::get('/', [JustificativaController::class, 'index'])->middleware('gi.permission:justificativa.listar')->name('index');
+    Route::get('/cids/pesquisar', [JustificativaController::class, 'pesquisarCids'])->name('cids.search');
     Route::get('/criar', [JustificativaController::class, 'create'])->middleware('gi.permission:justificativa.criar')->name('create');
     Route::post('/', [JustificativaController::class, 'store'])->middleware('gi.permission:justificativa.criar')->name('store');
     Route::patch('/{justificativa}/restaurar', [JustificativaController::class, 'restore'])->middleware('gi.permission:justificativa.restaurar')->name('restore');
     Route::delete('/{justificativa}/excluir-definitivamente', [JustificativaController::class, 'forceDestroy'])->middleware('gi.permission:justificativa.excluir_definitivamente')->name('force-destroy');
     Route::get('/{justificativa}/historico', [JustificativaController::class, 'historico'])->middleware('gi.permission:justificativa.historico')->name('historico');
-    Route::get('/{justificativa}/anexo', [JustificativaController::class, 'anexo'])->middleware('gi.permission:justificativa.visualizar')->name('anexo');
+    Route::get('/{justificativa}/anexos/{anexo}', [JustificativaController::class, 'anexo'])->middleware('gi.permission:justificativa.anexos.visualizar')->name('anexo');
+    Route::delete('/{justificativa}/anexos/{anexo}', [JustificativaController::class, 'destroyAnexo'])->middleware('gi.permission:justificativa.anexos.excluir')->name('anexos.destroy');
+    Route::get('/{justificativa}/editar', [JustificativaController::class, 'edit'])->middleware('gi.permission:justificativa.editar')->name('edit');
+    Route::put('/{justificativa}', [JustificativaController::class, 'update'])->middleware('gi.permission:justificativa.editar')->name('update');
     Route::get('/{justificativa}', [JustificativaController::class, 'show'])->middleware('gi.permission:justificativa.visualizar')->name('show');
     Route::delete('/{justificativa}', [JustificativaController::class, 'destroy'])->middleware('gi.permission:justificativa.excluir')->name('destroy');
 });

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Colaborador;
+use App\Services\DataTableServer;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -10,11 +12,16 @@ use Illuminate\View\View;
 
 class ColaboradorController extends Controller
 {
-    public function index(): View
+    public function index(Request $request, DataTableServer $dataTable): View|JsonResponse
     {
-        return view('colaboradores.index', [
-            'colaboradores' => Colaborador::query()->orderBy('nome')->get(),
-        ]);
+        if ($request->ajax()) {
+            return $dataTable->response($request, Colaborador::query(), ['id', 'nome', 'email', 'perfil', 'perfil_id', 'ativo', 'updated_at', null], fn ($registro) => [
+                'id' => $registro->id, 'nome' => $registro->nome, 'email' => $registro->email, 'perfil' => $registro->perfil, 'perfil_id' => $registro->perfil_id,
+                'situacao' => view('components.situacao', compact('registro'))->render(), 'atualizado_em' => $registro->updated_at?->format('d/m/Y H:i') ?? '—',
+                'acoes' => view('components.colaborador-actions', ['colaborador' => $registro])->render(),
+            ]);
+        }
+        return view('colaboradores.index');
     }
 
     public function show(Colaborador $colaborador): View

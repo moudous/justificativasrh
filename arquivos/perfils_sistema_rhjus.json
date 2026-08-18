@@ -212,6 +212,7 @@
                         "unidades.excluir_definitivamente",
                         "justificativa.listar",
                         "justificativa.visualizar",
+                        "justificativa.info_medicas",
                         "justificativa.criar",
                         "justificativa.excluir",
                         "justificativa.restaurar",

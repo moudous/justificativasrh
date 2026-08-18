@@ -1,0 +1,7 @@
+@extends('layouts.app')
+@section('title', 'Visualizar capítulo CID-10')
+@section('content')
+@if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
+<div class="page-header"><div><h1 class="page-title">Visualizar capítulo CID-10</h1><p class="page-description">Consulte os dados do capítulo.</p></div></div>
+<div class="card content-card"><div class="card-header"><h5>Dados do capítulo</h5></div><div class="card-body">@php($campos=[['ID',$capitulo->id],['Número do capítulo',$capitulo->numcap],['Categoria inicial',$capitulo->catinic],['Categoria final',$capitulo->catfim],['Descrição',$capitulo->descricao],['Descrição abreviada',$capitulo->descrabrev],['Situação',$capitulo->ativo?'Ativo':'Inativo'],['Data de cadastro',$capitulo->created_at?->format('d/m/Y H:i')],['Última alteração',$capitulo->updated_at?->format('d/m/Y H:i')]])<div class="row g-3">@foreach($campos as [$rotulo,$valor])<div class="col-md-6"><div class="form-label">{{ $rotulo }}</div><div class="form-control bg-body-tertiary h-auto text-break">{{ filled($valor)?$valor:'—' }}</div></div>@endforeach</div><div class="d-flex justify-content-end gap-2 mt-4">@if($giPermissoes->permite('cid10_capitulos.editar'))<a href="{{ route('cid10_capitulos.edit', $capitulo) }}" class="btn btn-primary"><i class="bi bi-pencil-fill me-1"></i>Editar</a>@endif @if($giPermissoes->permite('cid10_capitulos.listar'))<a href="{{ route('cid10_capitulos.index') }}" class="btn btn-outline-secondary">Voltar</a>@endif</div></div></div>
+@endsection

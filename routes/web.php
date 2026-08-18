@@ -13,8 +13,21 @@ use App\Http\Controllers\SetorController;
 use App\Http\Controllers\UnidadeController;
 use App\Services\GiColaboradorSynchronizer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/clear-cache', function () {
+    $exitCode = Artisan::call('optimize:clear');
+
+    return response()->json([
+        'success' => $exitCode === 0,
+        'message' => $exitCode === 0
+            ? 'Cache limpo com sucesso.'
+            : 'Não foi possível limpar o cache.',
+        'output' => trim(Artisan::output()),
+    ], $exitCode === 0 ? 200 : 500);
+})->name('clear-cache');
 
 Route::get('/auth/gi', function (Request $request) {
     abort_unless($request->filled('code'), 400, 'Código ausente.');

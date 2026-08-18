@@ -9,6 +9,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('justificativa_anexos')) {
+            return;
+        }
+
         Schema::create('justificativa_anexos', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('justificativa_id')->constrained('justificativas')->cascadeOnDelete();

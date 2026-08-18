@@ -11,6 +11,7 @@ class Responsavel extends Model
 {
     use SoftDeletes;
 
+    protected $table = 'responsaveis';
     protected $fillable = ['nome', 'cargo', 'colaborador_id'];
     protected $casts = ['colaborador_id' => 'integer'];
 

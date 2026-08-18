@@ -7,6 +7,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('anexos_justificativas')) {
+            return;
+        }
+
         Schema::rename('justificativa_anexos', 'anexos_justificativas');
     }
 

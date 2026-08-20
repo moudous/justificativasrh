@@ -46,6 +46,14 @@ Route::get('/auth/gi', function (Request $request) {
     $contexto = (array) $response->json('data');
     app(GiColaboradorSynchronizer::class)->sync($contexto);
 
+    if (! empty($contexto['atualizar'])) {
+        $directory = Http::withToken($contexto['access_token'])->acceptJson()->timeout(10)
+            ->get(rtrim(config('gi.gi_url'), '/').'/api/integracoes/v1/usuarios');
+        abort_unless($directory->successful(), 502, 'Não foi possível atualizar os colaboradores pelo GI.');
+        $total = app(GiColaboradorSynchronizer::class)->syncMany((array) $directory->json('data', []));
+        $contexto['atualizacao_usuarios'] = ['realizada' => true, 'total' => $total];
+    }
+
     $request->session()->regenerate();
     $request->session()->put('gi_context', $contexto);
 

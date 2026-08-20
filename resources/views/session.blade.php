@@ -25,6 +25,9 @@
     <main class="card">
         <h1>Justificativas RH</h1>
         <p>Sessão criada com segurança pelo GI.</p>
+        @if(data_get($context, 'atualizacao_usuarios.realizada'))
+            <div class="execution-context inside"><strong>Colaboradores atualizados</strong>O GI informou acréscimo de usuários e {{ data_get($context, 'atualizacao_usuarios.total', 0) }} colaborador(es) foram sincronizados.</div>
+        @endif
         <div id="executionContext" class="execution-context" role="status"></div>
         <section class="context-grid" aria-label="Contexto do perfil">
             <div class="context-card"><small>Usuário</small><strong>{{ data_get($context, 'usuario.nome', 'Não informado') }}</strong><div>{{ data_get($context, 'usuario.email') }}</div></div>

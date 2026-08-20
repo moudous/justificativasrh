@@ -21,6 +21,7 @@ unidades.listar
 unidades.visualizar
 unidades.criar
 unidades.excluir
+unidades.restaurar
 unidades.excluir_definitivamente
 justificativa.listar
 justificativa.visualizar

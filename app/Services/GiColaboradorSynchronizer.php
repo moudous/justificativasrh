@@ -8,6 +8,19 @@ use UnexpectedValueException;
 
 class GiColaboradorSynchronizer
 {
+    public function syncMany(array $usuarios): int
+    {
+        foreach ($usuarios as $usuario) {
+            $this->sync([
+                'usuario' => $usuario,
+                'perfil' => $usuario['perfil'] ?? ($usuario['perfis'][0] ?? []),
+                'sistema' => $usuario['sistema'] ?? [],
+            ]);
+        }
+
+        return count($usuarios);
+    }
+
     public function sync(array $contexto): Colaborador
     {
         $usuario = (array) ($contexto['usuario'] ?? []);
@@ -27,7 +40,7 @@ class GiColaboradorSynchronizer
             'email' => trim((string) ($usuario['email'] ?? '')),
             'perfil' => trim((string) ($perfil['nome'] ?? '')),
             'perfil_id' => $perfilId,
-            'ativo' => true,
+            'ativo' => array_key_exists('ativo', $usuario) ? (bool) $usuario['ativo'] : true,
         ];
 
         if ($dados['nome'] === '' || $dados['email'] === '' || $dados['perfil'] === '') {

@@ -15,7 +15,7 @@ class EnsureGiSession
         View::share('giPermissoes', app(GiPermissionService::class));
 
         abort_unless(
-            filter_var(env('GI_ALLOW_OUTSIDE_IFRAME', false), FILTER_VALIDATE_BOOL)
+            filter_var(config('gi.allow_outside_iframe'), FILTER_VALIDATE_BOOL)
                 || $request->session()->has('gi_context'),
             401,
             'Abra esta aplicação pelo menu do GI.',

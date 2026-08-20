@@ -33,10 +33,10 @@ Route::get('/auth/gi', function (Request $request) {
     abort_unless($request->filled('code'), 400, 'Código ausente.');
 
     $response = Http::asForm()->timeout(10)->post(
-        rtrim(env('GI_URL'), '/').'/integracoes/gi/trocar-codigo',
+        rtrim(config('gi.gi_url'), '/').'/integracoes/gi/trocar-codigo',
         [
-            'client_id' => env('GI_CLIENT_ID'),
-            'client_secret' => env('GI_CLIENT_SECRET'),
+            'client_id' => config('gi.client_id'),
+            'client_secret' => config('gi.client_secret'),
             'code' => $request->string('code')->toString(),
         ],
     );
@@ -182,7 +182,7 @@ Route::get('/gi/{resource}', function (Request $request, string $resource) {
 
     $upstreamResponse = Http::withToken($request->session()->get('gi_context.access_token'))
         ->acceptJson()->timeout(10)
-        ->get(rtrim(env('GI_URL'), '/').'/api/integracoes/v1/'.$resource);
+        ->get(rtrim(config('gi.gi_url'), '/').'/api/integracoes/v1/'.$resource);
 
     return response($upstreamResponse->body(), $upstreamResponse->status())
         ->header(

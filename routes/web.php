@@ -205,3 +205,16 @@ Route::get('/gi/{resource}', function (Request $request, string $resource) {
             $upstreamResponse->header('Content-Type') ?? 'application/json',
         );
 });
+
+Route::post('/manutencao/{acao}', function (Request $request, string $acao) {
+    abort_unless($request->session()->has('gi_context'), 401);
+    $comandos = ['optimize-clear' => 'optimize:clear', 'config-cache' => 'config:cache'];
+    abort_unless(isset($comandos[$acao]), 404);
+
+    $codigo = Artisan::call($comandos[$acao]);
+    $mensagem = $codigo === 0
+        ? "Comando php artisan {$comandos[$acao]} executado com sucesso."
+        : "O comando php artisan {$comandos[$acao]} terminou com código {$codigo}.";
+
+    return redirect('/')->with('manutencao', $mensagem);
+})->name('manutencao.executar');

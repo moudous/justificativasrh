@@ -25,6 +25,9 @@
     <main class="card">
         <h1>Justificativas RH</h1>
         <p>Sessão criada com segurança pelo GI.</p>
+        @if(session('manutencao'))
+            <div class="execution-context inside"><strong>Manutenção</strong>{{ session('manutencao') }}</div>
+        @endif
         @if(data_get($context, 'atualizacao_usuarios.realizada'))
             <div class="execution-context inside"><strong>Colaboradores atualizados</strong>O GI informou acréscimo de usuários e {{ data_get($context, 'atualizacao_usuarios.total', 0) }} colaborador(es) foram sincronizados.</div>
         @endif
@@ -37,6 +40,7 @@
         </section>
         <section class="permissions"><strong>Permissões entregues para este perfil</strong><div>@forelse((array)data_get($context, 'permissoes', []) as $permission)<code class="permission">{{ $permission }}</code>@empty<span> Nenhuma permissão foi concedida.</span>@endforelse</div></section>
         <div class="actions"><button data-resource="perfis">Carregar perfis</button><button data-resource="usuarios">Carregar usuários</button></div>
+        <div class="actions" aria-label="Manutenção do Laravel"><form method="POST" action="{{ route('manutencao.executar', 'optimize-clear') }}">@csrf<button type="submit">php artisan optimize:clear</button></form><form method="POST" action="{{ route('manutencao.executar', 'config-cache') }}">@csrf<button type="submit">php artisan config:cache</button></form></div>
         <h2>Contexto JSON recebido</h2><pre>{{ json_encode($context, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) }}</pre><pre id="result" hidden></pre>
     </main>
     <script>

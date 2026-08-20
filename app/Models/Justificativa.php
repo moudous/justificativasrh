@@ -25,6 +25,8 @@ class Justificativa extends Model
         'numero_dias',
         'data_retorno',
         'status',
+        'controle',
+        'mensagem_rh',
         'anexo_caminho',
         'anexo_nome_original',
         'anexo_mime',
@@ -51,15 +53,22 @@ class Justificativa extends Model
         static::created(function (Justificativa $justificativa): void {
             $justificativa->historicos()->create([
                 'evento' => 'criada',
-                'status_novo' => $justificativa->status,
+                'etapa_controle' => 'colaborador',
+                'historico' => 'Justificativa criada pelo colaborador',
             ]);
         });
 
         static::updated(function (Justificativa $justificativa): void {
+            if ($justificativa->wasChanged('controle')) {
+                return;
+            }
+
             $statusAlterado = $justificativa->wasChanged('status');
 
             $justificativa->historicos()->create([
                 'evento' => $statusAlterado ? 'status_alterado' : 'alterada',
+                'etapa_controle' => $justificativa->controle,
+                'historico' => $statusAlterado ? 'Situação da justificativa alterada' : 'Justificativa editada',
                 'status_anterior' => $statusAlterado ? $justificativa->getOriginal('status') : null,
                 'status_novo' => $statusAlterado ? $justificativa->status : null,
             ]);

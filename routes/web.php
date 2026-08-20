@@ -163,6 +163,13 @@ Route::middleware('gi.session')->prefix('justificativas')->name('justificativas.
     Route::put('/{justificativa}', [JustificativaController::class, 'update'])->middleware('gi.permission:justificativa.editar')->name('update');
     Route::get('/{justificativa}', [JustificativaController::class, 'show'])->middleware('gi.permission:justificativa.visualizar')->name('show');
     Route::delete('/{justificativa}', [JustificativaController::class, 'destroy'])->middleware('gi.permission:justificativa.excluir')->name('destroy');
+    Route::patch('/{justificativa}/controle', [JustificativaController::class, 'alterarControle'])->middleware('gi.permission:justificativa.listar')->name('controle');
+});
+
+Route::middleware(['gi.session', 'gi.permission:justificativa.listar'])->group(function (): void {
+    Route::get('/justificativa_gestao', [JustificativaController::class, 'gestao'])->name('justificativas.gestao');
+    Route::get('/justificativa_rh', [JustificativaController::class, 'rh'])->name('justificativas.rh');
+    Route::get('/justificativas_finalizadas', [JustificativaController::class, 'finalizadas'])->name('justificativas.finalizadas');
 });
 
 Route::get('/', function (Request $request) {

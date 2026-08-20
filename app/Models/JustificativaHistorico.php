@@ -9,7 +9,7 @@ class JustificativaHistorico extends Model
 {
     protected $table = 'justificativa_historicos';
 
-    protected $fillable = ['evento', 'status_anterior', 'status_novo'];
+    protected $fillable = ['evento', 'etapa_controle', 'historico', 'mensagem_rh', 'status_anterior', 'status_novo'];
 
     public function justificativa(): BelongsTo
     {

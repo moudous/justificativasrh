@@ -80,6 +80,7 @@ class JustificativaController extends Controller
         $dados['crm_medico'] = $dados['atestado_medico'] ? ($dados['crm_medico'] ?? null) : null;
         $dados['cid'] = $dados['atestado_medico'] ? ($dados['cid'] ?? null) : null;
         $dados['grau_parentesco_id'] = $dados['tipo_atestado'] === 'acompanhamento' ? ($dados['grau_parentesco_id'] ?? null) : null;
+        $dados = $this->normalizarOcorrencia($dados);
 
         $anexos = $request->file('anexos', []);
         unset($dados['anexos']);
@@ -117,6 +118,7 @@ class JustificativaController extends Controller
         $dados['crm_medico'] = $dados['atestado_medico'] ? ($dados['crm_medico'] ?? null) : null;
         $dados['cid'] = $dados['atestado_medico'] ? ($dados['cid'] ?? null) : null;
         $dados['grau_parentesco_id'] = $dados['tipo_atestado'] === 'acompanhamento' ? ($dados['grau_parentesco_id'] ?? null) : null;
+        $dados = $this->normalizarOcorrencia($dados);
 
         $anexos = $request->file('anexos', []);
         unset($dados['anexos']);
@@ -199,8 +201,15 @@ class JustificativaController extends Controller
     private function rules(): array
     {
         return [
-            'descricao' => ['required', 'string'],
+            'descricao' => ['nullable', 'string'],
             'categoria_id' => ['required', 'integer', Rule::exists('categorias', 'id')->whereNull('deleted_at')],
+            'tipo_ocorrencia' => ['required', Rule::in(['data', 'intervalo'])],
+            'data_ocorrencia' => ['nullable', Rule::requiredIf(fn (): bool => request('tipo_ocorrencia') === 'data'), 'date'],
+            'hora_inicial' => ['nullable', Rule::requiredIf(fn (): bool => request('tipo_ocorrencia') === 'data'), 'date_format:H:i'],
+            'hora_final' => ['nullable', Rule::requiredIf(fn (): bool => request('tipo_ocorrencia') === 'data'), 'date_format:H:i', 'after:hora_inicial'],
+            'data_inicial' => ['nullable', Rule::requiredIf(fn (): bool => request('tipo_ocorrencia') === 'intervalo'), 'date'],
+            'numero_dias' => ['nullable', Rule::requiredIf(fn (): bool => request('tipo_ocorrencia') === 'intervalo'), 'integer', 'min:0'],
+            'data_retorno' => ['nullable', Rule::requiredIf(fn (): bool => request('tipo_ocorrencia') === 'intervalo'), 'date', 'after_or_equal:data_inicial'],
             'anexos' => ['nullable', 'array'],
             'anexos.*' => ['file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:10240'],
             'atestado_medico' => ['required', 'boolean'],
@@ -223,6 +232,21 @@ class JustificativaController extends Controller
                 Rule::exists('graus_parentescos', 'id')->where(fn ($query) => $query->where('ativo', true)->whereNull('deleted_at')),
             ],
         ];
+    }
+
+    private function normalizarOcorrencia(array $dados): array
+    {
+        if ($dados['tipo_ocorrencia'] === 'data') {
+            $dados['data_inicial'] = null;
+            $dados['numero_dias'] = null;
+            $dados['data_retorno'] = null;
+        } else {
+            $dados['data_ocorrencia'] = null;
+            $dados['hora_inicial'] = null;
+            $dados['hora_final'] = null;
+        }
+
+        return $dados;
     }
 
     private function armazenarAnexos(Justificativa $justificativa, array $arquivos): void

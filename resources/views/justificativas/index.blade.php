@@ -16,7 +16,7 @@
         <div class="card-header"><h5>Justificativas cadastradas</h5></div>
         <div class="card-body p-0"><div class="table-responsive">
             <table id="justificativasTable" class="table table-hover align-middle w-100">
-                <thead><tr><th>ID</th><th>Descrição</th><th>Categoria</th><th>Situação</th><th>Última alteração</th><th class="text-center" data-dt-order="disable">Ações</th></tr></thead>
+                <thead><tr><th>ID</th><th>Descrição</th><th>Categoria/Ocorrência</th><th>Situação</th><th>Última alteração</th><th class="text-center" data-dt-order="disable">Ações</th></tr></thead>
                 <tbody></tbody>
             </table>
         </div></div>

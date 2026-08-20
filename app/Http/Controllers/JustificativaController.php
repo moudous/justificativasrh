@@ -112,7 +112,7 @@ class JustificativaController extends Controller
 
     public function update(Request $request, Justificativa $justificativa): RedirectResponse
     {
-        $dados = $request->validate($this->rules(false));
+        $dados = $request->validate($this->rules());
         $dados['tipo_atestado'] = $dados['atestado_medico'] ? ($dados['tipo_atestado'] ?? null) : null;
         $dados['crm_medico'] = $dados['atestado_medico'] ? ($dados['crm_medico'] ?? null) : null;
         $dados['cid'] = $dados['atestado_medico'] ? ($dados['cid'] ?? null) : null;
@@ -196,12 +196,12 @@ class JustificativaController extends Controller
         return back()->with('status', 'Anexo excluído com sucesso.');
     }
 
-    private function rules(bool $anexoObrigatorio = true): array
+    private function rules(): array
     {
         return [
             'descricao' => ['required', 'string'],
             'categoria_id' => ['required', 'integer', Rule::exists('categorias', 'id')->whereNull('deleted_at')],
-            'anexos' => [$anexoObrigatorio ? 'required' : 'nullable', 'array'],
+            'anexos' => ['nullable', 'array'],
             'anexos.*' => ['file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:10240'],
             'atestado_medico' => ['required', 'boolean'],
             'crm_medico' => [

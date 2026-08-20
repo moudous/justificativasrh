@@ -13,8 +13,8 @@
 <div class="col-md-6"><label for="colaborador" class="form-label">Colaborador <span class="text-danger">*</span></label><input id="colaborador" class="form-control" value="{{ $colaborador->nome }}" disabled></div>
 <div class="col-md-6"><label for="categoria_id" class="form-label">Categoria <span class="text-danger">*</span></label><select id="categoria_id" name="categoria_id" class="form-select" required><option value="">Selecione</option>@foreach($categorias as $categoria)<option value="{{ $categoria->id }}" @selected((string)old('categoria_id', $justificativa->categoria_id ?? '')===(string)$categoria->id)>{{ $categoria->nome }}</option>@endforeach</select></div>
 
-<div class="col-12"><div class="form-label">Anexos @unless($editando)<span class="text-danger">*</span>@endunless</div><div class="form-text mb-2">PDF, JPG, PNG ou WebP, com até 10 MB por arquivo.</div>
-<input type="file" id="anexos" name="anexos[]" class="visually-hidden" accept="application/pdf,image/jpeg,image/png,image/webp" multiple @required(!$editando)>
+<div class="col-12"><div class="form-label">Anexos <span class="text-muted fw-normal">(opcional)</span></div><div class="form-text mb-2">PDF, JPG, PNG ou WebP, com até 10 MB por arquivo.</div>
+<input type="file" id="anexos" name="anexos[]" class="visually-hidden" accept="application/pdf,image/jpeg,image/png,image/webp" multiple>
 <div id="anexosGrid" class="row g-3">
 @if($editando)
 @foreach($justificativa->anexos as $anexo)

@@ -173,7 +173,6 @@ Route::get('/', function (Request $request) {
 
     return response()
         ->view('session', ['context' => $visibleContext])
-        ->header('Content-Security-Policy', "frame-ancestors ".env('GI_FRAME_ANCESTORS')."; object-src 'none'; base-uri 'self'")
         ->header('Cache-Control', 'no-store');
 });
 

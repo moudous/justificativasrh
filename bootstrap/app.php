@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\AllowGiEmbedding;
+use App\Http\Middleware\EnsureGiFrameAccess;
 use App\Http\Middleware\EnsureGiSession;
 use App\Http\Middleware\RequireGiPermission;
 
@@ -13,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/health',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->appendToGroup('web', EnsureGiFrameAccess::class);
         $middleware->append(AllowGiEmbedding::class);
 
         $middleware->alias([

@@ -58,7 +58,7 @@ Route::get('/auth/gi', function (Request $request) {
     }
 
     return redirect($destination);
-});
+})->name('auth.gi');
 
 Route::middleware('gi.session')->prefix('colaboradores')->name('colaboradores.')->group(function (): void {
     Route::get('/', [ColaboradorController::class, 'index'])->middleware('gi.permission:colaboradores.listar')->name('index');

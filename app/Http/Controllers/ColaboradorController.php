@@ -6,6 +6,7 @@ use App\Models\Colaborador;
 use App\Models\Responsavel;
 use App\Models\Setor;
 use App\Services\DataTableServer;
+use App\Services\GiColaboradorSynchronizer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -36,6 +37,19 @@ class ColaboradorController extends Controller
             ]);
         }
         return view('colaboradores.index');
+    }
+
+    public function import(Request $request, GiColaboradorSynchronizer $synchronizer): JsonResponse
+    {
+        $accessToken = (string) $request->session()->get('gi_context.access_token', '');
+        abort_if($accessToken === '', 401, 'Token de acesso do GI não encontrado. Abra novamente pelo menu do GI.');
+
+        $total = $synchronizer->syncFromGi($accessToken);
+
+        return response()->json([
+            'message' => "$total colaborador(es) importado(s) com sucesso.",
+            'total' => $total,
+        ]);
     }
 
     public function show(Colaborador $colaborador): View

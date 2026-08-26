@@ -4,21 +4,39 @@ namespace App\Services;
 
 use App\Models\Colaborador;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use UnexpectedValueException;
 
 class GiColaboradorSynchronizer
 {
+    public function syncFromGi(string $accessToken): int
+    {
+        $response = Http::withToken($accessToken)->acceptJson()->timeout(30)
+            ->get(rtrim(config('gi.gi_url'), '/').'/api/integracoes/v1/usuarios');
+
+        abort_unless($response->successful(), 502, 'Não foi possível importar os colaboradores do GI.');
+
+        return $this->syncMany((array) $response->json('data', []));
+    }
+
     public function syncMany(array $usuarios): int
     {
+        $total = 0;
+
         foreach ($usuarios as $usuario) {
+            if (! is_array($usuario)) {
+                continue;
+            }
+
             $this->sync([
                 'usuario' => $usuario,
                 'perfil' => $usuario['perfil'] ?? ($usuario['perfis'][0] ?? []),
                 'sistema' => $usuario['sistema'] ?? [],
             ]);
+            $total++;
         }
 
-        return count($usuarios);
+        return $total;
     }
 
     public function sync(array $contexto): Colaborador

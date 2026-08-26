@@ -44,13 +44,11 @@ Route::get('/auth/gi', function (Request $request) {
     abort_unless($response->successful(), 401, 'Não foi possível autenticar pelo GI.');
 
     $contexto = (array) $response->json('data');
-    app(GiColaboradorSynchronizer::class)->sync($contexto);
+    $synchronizer = app(GiColaboradorSynchronizer::class);
+    $synchronizer->sync($contexto);
 
     if (! empty($contexto['atualizar'])) {
-        $directory = Http::withToken($contexto['access_token'])->acceptJson()->timeout(10)
-            ->get(rtrim(config('gi.gi_url'), '/').'/api/integracoes/v1/usuarios');
-        abort_unless($directory->successful(), 502, 'Não foi possível atualizar os colaboradores pelo GI.');
-        $total = app(GiColaboradorSynchronizer::class)->syncMany((array) $directory->json('data', []));
+        $total = $synchronizer->syncFromGi((string) $contexto['access_token']);
         $contexto['atualizacao_usuarios'] = ['realizada' => true, 'total' => $total];
     }
 
@@ -70,6 +68,7 @@ Route::get('/auth/gi', function (Request $request) {
 
 Route::middleware('gi.session')->prefix('colaboradores')->name('colaboradores.')->group(function (): void {
     Route::get('/', [ColaboradorController::class, 'index'])->middleware('gi.permission:colaboradores.listar')->name('index');
+    Route::post('/importar', [ColaboradorController::class, 'import'])->middleware('gi.permission:colaboradores.listar')->name('import');
     Route::get('/{colaborador}', [ColaboradorController::class, 'show'])->middleware('gi.permission:colaboradores.visualizar')->name('show');
     Route::get('/{colaborador}/edit', [ColaboradorController::class, 'edit'])->middleware('gi.permission:colaboradores.editar')->name('edit');
     Route::put('/{colaborador}', [ColaboradorController::class, 'update'])->middleware('gi.permission:colaboradores.editar')->name('update');

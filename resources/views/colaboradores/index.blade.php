@@ -12,6 +12,13 @@
             <h1 class="page-title">Colaboradores</h1>
             <p class="page-description">Consulte os colaboradores sincronizados automaticamente ao acessarem pelo GI.</p>
         </div>
+        <button id="importPeople" type="button" class="btn btn-primary">
+            <i class="bi bi-cloud-arrow-down-fill me-2"></i><span>Importar usuários</span>
+        </button>
+    </div>
+
+    <div id="importFeedback" class="alert alert-dismissible fade show d-none" role="alert">
+        <span></span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
     </div>
 
     <div class="card content-card">
@@ -34,7 +41,8 @@
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => new DataTable('#colaboradoresTable', { processing: true, serverSide: true, ajax: '{{ route('colaboradores.index') }}', columns: [{data:'id'},{data:'nome'},{data:'email'},{data:'perfil'},{data:'setor'},{data:'responsavel'},{data:'situacao'},{data:'atualizado_em'},{data:'acoes'}],
+        document.addEventListener('DOMContentLoaded', () => {
+            const table = new DataTable('#colaboradoresTable', { processing: true, serverSide: true, ajax: @json(route('colaboradores.index', [], false)), columns: [{data:'id'},{data:'nome'},{data:'email'},{data:'perfil'},{data:'setor'},{data:'responsavel'},{data:'situacao'},{data:'atualizado_em'},{data:'acoes'}],
             columnDefs: [
                 { targets: [0, 6, 7], className: 'text-nowrap' },
                 { targets: 8, orderable: false, searchable: false, className: 'text-center text-nowrap' }
@@ -49,6 +57,43 @@
                 lengthMenu: 'Exibir _MENU_ registros', search: 'Pesquisar:',
                 zeroRecords: 'Nenhum colaborador encontrado.', paginate: { first: 'Primeira', last: 'Última', next: 'Próxima', previous: 'Anterior' }
             }
-        }));
+            });
+
+            const button = document.getElementById('importPeople');
+            const buttonLabel = button.querySelector('span');
+            const feedback = document.getElementById('importFeedback');
+
+            button.addEventListener('click', async () => {
+                button.disabled = true;
+                buttonLabel.textContent = 'Importando...';
+                feedback.classList.add('d-none');
+
+                try {
+                    const response = await fetch(@json(route('colaboradores.import', [], false)), {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': @json(csrf_token()),
+                        },
+                    });
+                    const payload = await response.json().catch(() => ({message: 'O servidor retornou uma resposta inválida.'}));
+                    if (! response.ok) throw new Error(payload.message || `Falha na importação (HTTP ${response.status}).`);
+
+                    feedback.querySelector('span').textContent = payload.message;
+                    feedback.classList.remove('d-none', 'alert-danger');
+                    feedback.classList.add('alert-success');
+                    table.ajax.reload(null, false);
+                } catch (error) {
+                    feedback.querySelector('span').textContent = error.message;
+                    feedback.classList.remove('d-none', 'alert-success');
+                    feedback.classList.add('alert-danger');
+                } finally {
+                    button.disabled = false;
+                    buttonLabel.textContent = 'Importar usuários';
+                }
+            });
+        });
     </script>
 @endpush

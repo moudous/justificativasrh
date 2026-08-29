@@ -31,6 +31,7 @@ class GiColaboradorSynchronizer
             $this->sync([
                 'usuario' => $usuario,
                 'perfil' => $usuario['perfil'] ?? ($usuario['perfis'][0] ?? []),
+                'perfis' => $usuario['perfis'] ?? [],
                 'sistema' => $usuario['sistema'] ?? [],
             ]);
             $total++;
@@ -60,6 +61,25 @@ class GiColaboradorSynchronizer
             'perfil_id' => $perfilId,
             'ativo' => array_key_exists('ativo', $usuario) ? (bool) $usuario['ativo'] : true,
         ];
+
+        if (array_key_exists('perfis', $contexto)) {
+            $dados['perfis'] = collect((array) $contexto['perfis'])
+                ->filter(fn ($item): bool => is_array($item))
+                ->map(fn (array $item): array => [
+                    'id' => isset($item['id']) ? (int) $item['id'] : null,
+                    'nome' => trim((string) ($item['nome'] ?? '')),
+                    'ultimo_login_em' => $item['ultimo_login_em'] ?? null,
+                ])
+                ->filter(fn (array $item): bool => $item['id'] !== null && $item['nome'] !== '')
+                ->values()
+                ->all();
+        }
+
+        if (array_key_exists('ultimo_acesso', $usuario)) {
+            $dados['ultimo_login_em'] = filled($usuario['ultimo_acesso'])
+                ? (string) $usuario['ultimo_acesso']
+                : null;
+        }
 
         if ($dados['nome'] === '' || $dados['email'] === '' || $dados['perfil'] === '') {
             throw new UnexpectedValueException('O GI não informou nome, e-mail e perfil do usuário.');

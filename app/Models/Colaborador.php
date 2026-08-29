@@ -14,11 +14,13 @@ class Colaborador extends Model
 
     protected $keyType = 'int';
 
-    protected $fillable = ['id', 'nome', 'email', 'perfil', 'perfil_id', 'ativo', 'setor_id', 'responsavel_id'];
+    protected $fillable = ['id', 'nome', 'email', 'perfil', 'perfil_id', 'perfis', 'ativo', 'ultimo_login_em', 'setor_id', 'responsavel_id'];
 
     protected $casts = [
         'ativo' => 'boolean',
         'perfil_id' => 'integer',
+        'perfis' => 'array',
+        'ultimo_login_em' => 'datetime',
         'setor_id' => 'integer',
         'responsavel_id' => 'integer',
     ];

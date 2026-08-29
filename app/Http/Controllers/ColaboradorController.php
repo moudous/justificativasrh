@@ -29,10 +29,24 @@ class ColaboradorController extends Controller
                 })
                 ->leftJoin('colaboradores as responsavel_colaborador', 'responsavel_colaborador.id', '=', 'responsaveis.colaborador_id');
 
-            return $dataTable->response($request, $query, ['colaboradores.id', 'colaboradores.nome', 'colaboradores.email', 'colaboradores.perfil', 'setores.nome', 'responsavel_colaborador.nome', 'colaboradores.ativo', 'colaboradores.updated_at', null], fn ($registro) => [
-                'id' => $registro->id, 'nome' => $registro->nome, 'email' => $registro->email, 'perfil' => $registro->perfil,
+            return $dataTable->response($request, $query, ['colaboradores.id', 'colaboradores.nome', 'colaboradores.email', 'colaboradores.perfis', 'setores.nome', 'responsavel_colaborador.nome', 'colaboradores.ativo', 'colaboradores.ultimo_login_em', 'colaboradores.updated_at', null], fn ($registro) => [
+                'id' => $registro->id, 'nome' => $registro->nome, 'email' => $registro->email,
+                'perfil' => collect($registro->perfis ?: [[
+                    'id' => $registro->perfil_id,
+                    'nome' => $registro->perfil,
+                ]])->filter(fn ($perfil): bool => filled($perfil['nome'] ?? null))
+                    ->map(function (array $perfil) use ($registro): string {
+                        $ultimo = (int) ($perfil['id'] ?? 0) === (int) $registro->perfil_id
+                            && $registro->ultimo_login_em !== null;
+                        $cor = $ultimo ? 'text-bg-primary' : 'text-bg-secondary';
+                        $titulo = $ultimo ? ' title="Perfil do último acesso"' : '';
+
+                        return '<span class="badge '.$cor.'"'.$titulo.'>'.e($perfil['nome']).'</span>';
+                    })->implode(', '),
                 'setor' => $registro->setor?->nome ?? '—', 'responsavel' => $registro->responsavel?->colaborador?->nome ?? '—',
-                'situacao' => view('components.situacao', compact('registro'))->render(), 'atualizado_em' => $registro->updated_at?->format('d/m/Y H:i') ?? '—',
+                'situacao' => view('components.situacao', compact('registro'))->render(),
+                'ultimo_login' => $registro->ultimo_login_em?->format('d/m/Y H:i') ?? 'Nunca acessou',
+                'atualizado_em' => $registro->updated_at?->format('d/m/Y H:i') ?? '—',
                 'acoes' => view('components.colaborador-actions', ['colaborador' => $registro])->render(),
             ]);
         }

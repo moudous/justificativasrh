@@ -63,6 +63,10 @@ cid10_grupos.editar
 cid10_grupos.excluir
 cid10_grupos.restaurar
 responsaveis.listar
+responsaveis.equipe.listar
+responsaveis.equipe.criar
+responsaveis.equipe.excluir
+responsaveis.minha_equipe
 responsaveis.visualizar
 responsaveis.criar
 responsaveis.editar

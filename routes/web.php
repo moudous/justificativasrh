@@ -150,6 +150,12 @@ Route::middleware('gi.session')->prefix('responsaveis')->name('responsaveis.')->
     Route::post('/', [ResponsavelController::class, 'store'])->middleware('gi.permission:responsaveis.criar')->name('store');
     Route::patch('/{responsavel}/restaurar', [ResponsavelController::class, 'restore'])->middleware('gi.permission:responsaveis.restaurar')->name('restore');
     Route::delete('/{responsavel}/excluir-definitivamente', [ResponsavelController::class, 'forceDestroy'])->middleware('gi.permission:responsaveis.excluir_definitivamente')->name('force-destroy');
+    Route::middleware('gi.permission:responsaveis.equipe.listar')->prefix('{responsavel}/equipe')->name('equipe.')->group(function (): void {
+        Route::get('/', [ResponsavelController::class, 'equipe'])->name('index');
+        Route::get('/pesquisar', [ResponsavelController::class, 'pesquisarEquipe'])->middleware('gi.permission:responsaveis.equipe.criar')->name('search');
+        Route::post('/', [ResponsavelController::class, 'adicionarEquipe'])->middleware('gi.permission:responsaveis.equipe.criar')->name('store');
+        Route::delete('/{colaborador}', [ResponsavelController::class, 'removerEquipe'])->middleware('gi.permission:responsaveis.equipe.excluir')->name('destroy');
+    });
     Route::get('/{responsavel}', [ResponsavelController::class, 'show'])->middleware('gi.permission:responsaveis.visualizar')->name('show');
     Route::get('/{responsavel}/editar', [ResponsavelController::class, 'edit'])->middleware('gi.permission:responsaveis.editar')->name('edit');
     Route::put('/{responsavel}', [ResponsavelController::class, 'update'])->middleware('gi.permission:responsaveis.editar')->name('update');

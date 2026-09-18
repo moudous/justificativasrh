@@ -1,4 +1,9 @@
 @extends('layouts.app')
+@php
+    $areaColaborador = request()->routeIs('justificativas_colaborador.*');
+    $prefixoRotas = $areaColaborador ? 'justificativas_colaborador' : 'justificativas';
+    $prefixoPermissoes = $areaColaborador ? 'justificativas_colaborador' : 'justificativa';
+@endphp
 
 @section('title', $titulo)
 
@@ -10,7 +15,7 @@
     @if (session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
     <div class="page-header">
         <div><h1 class="page-title">{{ $titulo }}</h1><p class="page-description">{{ $descricao }}</p></div>
-        @if ($controle === 'colaborador' && $giPermissoes->permite('justificativa.criar'))<a href="{{ route('justificativas.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Cadastrar justificativa</a>@endif
+        @if ($controle === 'colaborador' && $giPermissoes->permite($prefixoPermissoes.'.criar'))<a href="{{ route($prefixoRotas.'.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Cadastrar justificativa</a>@endif
     </div>
     <div class="card content-card">
         <div class="card-header"><h5>Justificativas cadastradas</h5></div>

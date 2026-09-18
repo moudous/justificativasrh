@@ -1,11 +1,16 @@
 @extends('layouts.app')
+@php
+    $areaColaborador = request()->routeIs('justificativas_colaborador.*');
+    $prefixoRotas = $areaColaborador ? 'justificativas_colaborador' : 'justificativas';
+    $prefixoPermissoes = $areaColaborador ? 'justificativas_colaborador' : 'justificativa';
+@endphp
 @php($editando = isset($justificativa))
 @section('title', $editando ? 'Editar justificativa' : 'Cadastrar justificativa')
 @push('styles')<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"><link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet">@endpush
 
 @section('content')
 <div class="page-header"><div><h1 class="page-title">{{ $editando ? 'Editar' : 'Cadastrar' }} justificativa</h1><p class="page-description">Informe os dados e os documentos comprobatórios.</p></div></div>
-<form method="POST" action="{{ $editando ? route('justificativas.update', $justificativa) : route('justificativas.store') }}" enctype="multipart/form-data">@csrf @if($editando) @method('PUT') @endif
+<form method="POST" action="{{ $editando ? route($prefixoRotas.'.update', $justificativa) : route($prefixoRotas.'.store') }}" enctype="multipart/form-data">@csrf @if($editando) @method('PUT') @endif
 <div class="card content-card"><div class="card-header"><h5>Dados da justificativa</h5></div><div class="card-body">
 @if($errors->any())<div class="alert alert-danger"><ul class="mb-0">@foreach($errors->all() as $erro)<li>{{ $erro }}</li>@endforeach</ul></div>@endif
 <div class="row g-3">
@@ -22,8 +27,8 @@
 <div id="anexosGrid" class="row g-3">
 @if($editando)
 @foreach($justificativa->anexos as $anexo)
-<div class="col-6 col-md-4 col-lg-3 anexo-card" data-persistido="true"><div class="card h-100 position-relative">@if($giPermissoes->permite('justificativa.anexos.excluir'))<button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 excluir-anexo" style="z-index:2" data-url="{{ route('justificativas.anexos.destroy', [$justificativa, $anexo]) }}" title="Excluir anexo" aria-label="Excluir {{ $anexo->nome_original }}"><i class="bi bi-trash-fill"></i></button>@endif
-@if($giPermissoes->permite('justificativa.anexos.visualizar'))<a href="{{ route('justificativas.anexo', [$justificativa, $anexo]) }}" class="abrir-anexo-viewer" data-nome="{{ $anexo->nome_original }}" data-colaborador="{{ $colaborador->nome }}" data-mime="{{ $anexo->mime }}">@if(str_starts_with($anexo->mime, 'image/'))<img src="{{ route('justificativas.anexo', [$justificativa, $anexo]) }}" class="card-img-top object-fit-cover" style="height:150px" alt="{{ $anexo->nome_original }}">@else<div class="d-flex align-items-center justify-content-center bg-light text-danger" style="height:150px"><i class="bi bi-file-earmark-pdf-fill" style="font-size:4rem"></i></div>@endif</a>@else<div class="d-flex align-items-center justify-content-center bg-light text-secondary" style="height:150px"><i class="bi bi-paperclip" style="font-size:3rem"></i></div>@endif
+<div class="col-6 col-md-4 col-lg-3 anexo-card" data-persistido="true"><div class="card h-100 position-relative">@if($giPermissoes->permite($areaColaborador ? 'justificativas_colaborador.editar' : 'justificativa.anexos.excluir'))<button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 excluir-anexo" style="z-index:2" data-url="{{ route($prefixoRotas.'.anexos.destroy', [$justificativa, $anexo]) }}" title="Excluir anexo" aria-label="Excluir {{ $anexo->nome_original }}"><i class="bi bi-trash-fill"></i></button>@endif
+@if($giPermissoes->permite($areaColaborador ? 'justificativas_colaborador.visualizar' : 'justificativa.anexos.visualizar'))<a href="{{ route($prefixoRotas.'.anexo', [$justificativa, $anexo]) }}" class="abrir-anexo-viewer" data-nome="{{ $anexo->nome_original }}" data-colaborador="{{ $colaborador->nome }}" data-mime="{{ $anexo->mime }}">@if(str_starts_with($anexo->mime, 'image/'))<img src="{{ route($prefixoRotas.'.anexo', [$justificativa, $anexo]) }}" class="card-img-top object-fit-cover" style="height:150px" alt="{{ $anexo->nome_original }}">@else<div class="d-flex align-items-center justify-content-center bg-light text-danger" style="height:150px"><i class="bi bi-file-earmark-pdf-fill" style="font-size:4rem"></i></div>@endif</a>@else<div class="d-flex align-items-center justify-content-center bg-light text-secondary" style="height:150px"><i class="bi bi-paperclip" style="font-size:3rem"></i></div>@endif
 <div class="card-body p-2 small text-truncate" title="{{ $anexo->nome_original }}">{{ $anexo->nome_original }}</div></div></div>
 @endforeach
 @endif
@@ -35,7 +40,7 @@
 <div id="tipoAtestadoBloco" class="col-12 d-none"><fieldset><legend class="form-label fs-6">É um atestado próprio ou de acompanhamento de familiar? <span class="text-danger">*</span></legend><div class="d-flex gap-4"><div class="form-check"><input class="form-check-input" type="radio" name="tipo_atestado" id="tipo_proprio" value="proprio" @checked(old('tipo_atestado',$justificativa->tipo_atestado??null)==='proprio')><label for="tipo_proprio">Atestado próprio</label></div><div class="form-check"><input class="form-check-input" type="radio" name="tipo_atestado" id="tipo_acompanhamento" value="acompanhamento" @checked(old('tipo_atestado',$justificativa->tipo_atestado??null)==='acompanhamento')><label for="tipo_acompanhamento">Acompanhamento de familiar</label></div></div></fieldset></div>
 <div id="parentescoBloco" class="col-md-6 d-none"><label for="grau_parentesco_id" class="form-label">Grau de parentesco <span class="text-danger">*</span></label><select id="grau_parentesco_id" name="grau_parentesco_id" class="form-select"><option value="">Selecione</option>@foreach($grausParentesco as $grau)<option value="{{ $grau->id }}" @selected((string)old('grau_parentesco_id',$justificativa->grau_parentesco_id??'')===(string)$grau->id)>{{ $grau->nome }}</option>@endforeach</select></div>
 <div class="col-12"><label for="descricao" class="form-label">Descrição <span class="text-muted fw-normal">(Caso tenha algo a mais para informar digite aqui)</span></label><textarea id="descricao" name="descricao" rows="5" class="form-control @error('descricao') is-invalid @enderror" placeholder="exemplo: o dia de day off foi utilizado dia ...">{{ old('descricao', $justificativa->descricao ?? '') }}</textarea>@error('descricao')<div class="invalid-feedback">{{ $message }}</div>@enderror</div>
-</div><div class="d-flex justify-content-end gap-2 mt-4"><a href="{{ route('justificativas.index') }}" class="btn btn-outline-secondary">Cancelar</a><button class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Salvar</button></div></div></div></form>
+</div><div class="d-flex justify-content-end gap-2 mt-4"><a href="{{ route($prefixoRotas.'.index') }}" class="btn btn-outline-secondary">Cancelar</a><button class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Salvar</button></div></div></div></form>
 @include('components.anexo-viewer')
 @endsection
 
@@ -43,7 +48,7 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script><script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    $('#cid').select2({theme:'bootstrap-5',placeholder:'Pesquise pelo código ou descrição',allowClear:true,width:'100%',minimumInputLength:1,ajax:{url:'{{ route('justificativas.cids.search') }}',dataType:'json',delay:300,data:params=>({q:params.term}),processResults:data=>data,cache:true}});
+    $('#cid').select2({theme:'bootstrap-5',placeholder:'Pesquise pelo código ou descrição',allowClear:true,width:'100%',minimumInputLength:1,ajax:{url:'{{ route($prefixoRotas.'.cids.search') }}',dataType:'json',delay:300,data:params=>({q:params.term}),processResults:data=>data,cache:true}});
     const tipoOcorrencia = document.getElementById('tipo_ocorrencia'), dataOcorrenciaBloco = document.getElementById('dataOcorrenciaBloco'), intervaloOcorrenciaBloco = document.getElementById('intervaloOcorrenciaBloco'), dataOcorrencia = document.getElementById('data_ocorrencia'), horaInicial = document.getElementById('hora_inicial'), horaFinal = document.getElementById('hora_final'), dataInicial = document.getElementById('data_inicial'), numeroDias = document.getElementById('numero_dias'), dataRetorno = document.getElementById('data_retorno');
     const atualizarTipoOcorrencia = () => { const intervalo = tipoOcorrencia.value === 'intervalo'; dataOcorrenciaBloco.classList.toggle('d-none', intervalo); intervaloOcorrenciaBloco.classList.toggle('d-none', !intervalo); dataOcorrencia.required = !intervalo; horaInicial.required = !intervalo; horaFinal.required = !intervalo; dataInicial.required = intervalo; numeroDias.required = intervalo; dataRetorno.required = intervalo; };
     const recalcularRetorno = () => { if (!dataInicial.value || numeroDias.value === '' || Number(numeroDias.value) < 0) return; const data = new Date(`${dataInicial.value}T12:00:00`); data.setDate(data.getDate() + Number(numeroDias.value)); dataRetorno.value = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}-${String(data.getDate()).padStart(2, '0')}`; };

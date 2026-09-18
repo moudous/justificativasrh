@@ -29,6 +29,37 @@ class JustificativaController extends Controller
             'Justificativas que ainda podem ser editadas e encaminhadas.', route('justificativas.index'), $colaborador->id);
     }
 
+    public function colaborador(Request $request, DataTableServer $dataTable): View|JsonResponse
+    {
+        return $this->listagem($request, $dataTable, 'colaborador', 'Minhas Justificativas',
+            'Acompanhe todas as suas justificativas, inclusive as aprovadas ou rejeitadas.',
+            route('justificativas_colaborador.index'), $this->colaboradorLogado($request)->id);
+    }
+
+    public function enviarResponsavel(Request $request, Justificativa $justificativa): JsonResponse
+    {
+        abort_unless($justificativa->colaborador_id === $this->colaboradorLogado($request)->id && $justificativa->controle === 'colaborador', 403);
+        $responsavel = $justificativa->colaborador()->first()?->responsavel;
+        abort_unless($responsavel, 422, 'Você não possui responsável vinculado. Solicite o vínculo à sua equipe antes de enviar.');
+
+        $statusAnterior = $justificativa->status;
+        $justificativa->update(['controle' => 'gestao', 'status' => 'Enviada ao responsável']);
+        $justificativa->historicos()->create([
+            'evento' => 'controle_alterado',
+            'etapa_controle' => 'colaborador',
+            'historico' => 'Enviada ao responsável',
+            'status_anterior' => $statusAnterior,
+            'status_novo' => 'Enviada ao responsável',
+        ]);
+
+        return response()->json(['message' => 'Justificativa enviada ao responsável com sucesso.', 'controle' => 'gestao']);
+    }
+
+    private function prefixoRotas(): string
+    {
+        return request()->routeIs('justificativas_colaborador.*') ? 'justificativas_colaborador' : 'justificativas';
+    }
+
     public function gestao(Request $request, DataTableServer $dataTable): View|JsonResponse
     {
         $responsavelId = Responsavel::query()->where('colaborador_id', $this->colaboradorLogado($request)->id)->value('id');
@@ -63,7 +94,7 @@ class JustificativaController extends Controller
         if ($request->ajax()) {
             $query = clone $queryBase;
             $query->when($request->integer('colaborador_id'), fn ($filtro, $id) => $filtro->where('justificativas.colaborador_id', $id));
-            $query->when(in_array($request->input('controle'), ['aprovado', 'reprovado'], true) ? $request->input('controle') : null, fn ($filtro, $controle) => $filtro->where('justificativas.controle', $controle));
+            $query->when(in_array($request->input('controle'), ['aprovado', 'reprovado'], true) ? $request->input('controle') : null, fn ($filtro, $controle) => $filtro->when($this->prefixoRotas() !== 'justificativas_colaborador', fn ($consulta) => $consulta->where('justificativas.controle', $controle)));
             $query->when($request->integer('categoria_id'), fn ($filtro, $id) => $filtro->where('justificativas.categoria_id', $id));
             $texto = trim((string) $request->input('texto', ''));
             $query->when($texto !== '', fn ($filtro) => $filtro->where(fn ($busca) => $busca
@@ -106,7 +137,7 @@ class JustificativaController extends Controller
     public function pesquisarCids(Request $request, GiPermissionService $permissoes): JsonResponse
     {
         abort_unless(
-            $permissoes->permite('justificativa.criar', $request) || $permissoes->permite('justificativa.editar', $request),
+            $permissoes->permite(($this->prefixoRotas() === 'justificativas_colaborador' ? 'justificativas_colaborador' : 'justificativa').'.criar', $request) || $permissoes->permite(($this->prefixoRotas() === 'justificativas_colaborador' ? 'justificativas_colaborador' : 'justificativa').'.editar', $request),
             403,
         );
 
@@ -148,7 +179,7 @@ class JustificativaController extends Controller
             throw $erro;
         }
 
-        return redirect()->route('justificativas.show', $justificativa)
+        return redirect()->route($this->prefixoRotas().'.show', $justificativa)
             ->with('status', 'Justificativa cadastrada com sucesso.');
     }
 
@@ -184,7 +215,7 @@ class JustificativaController extends Controller
             throw $erro;
         }
 
-        return redirect()->route('justificativas.show', $justificativa)
+        return redirect()->route($this->prefixoRotas().'.show', $justificativa)
             ->with('status', 'Justificativa atualizada com sucesso.');
     }
 
@@ -206,7 +237,7 @@ class JustificativaController extends Controller
         abort_unless($registro->controle === 'colaborador' && $registro->colaborador_id === $this->colaboradorLogado($request)->id, 403, 'Esta justificativa não pode ser excluída por este colaborador.');
         $registro->delete();
 
-        return redirect()->route('justificativas.index')
+        return redirect()->route($this->prefixoRotas().'.index')
             ->with('status', 'Justificativa excluída com sucesso.');
     }
 
@@ -214,7 +245,7 @@ class JustificativaController extends Controller
     {
         Justificativa::onlyTrashed()->findOrFail($justificativa)->restore();
 
-        return redirect()->route('justificativas.index')
+        return redirect()->route($this->prefixoRotas().'.index')
             ->with('status', 'Justificativa restaurada com sucesso.');
     }
 
@@ -222,7 +253,7 @@ class JustificativaController extends Controller
     {
         Justificativa::onlyTrashed()->findOrFail($justificativa)->forceDelete();
 
-        return redirect()->route('justificativas.index')
+        return redirect()->route($this->prefixoRotas().'.index')
             ->with('status', 'Justificativa excluída definitivamente.');
     }
 
@@ -318,12 +349,19 @@ class JustificativaController extends Controller
     private function listagem(Request $request, DataTableServer $dataTable, string $controle, string $titulo, string $descricao, string $ajaxUrl, ?int $colaboradorId = null, ?int $responsavelId = null): View|JsonResponse
     {
         if ($request->ajax()) {
+            $areaColaborador = $this->prefixoRotas() === 'justificativas_colaborador';
             $mostrarColaborador = $controle !== 'colaborador';
             $query = Justificativa::query()
-                ->with(['categoria', 'colaborador.responsavel.colaborador'])
-                ->when($controle === 'colaborador', fn ($consulta) => $consulta->withTrashed())
+                ->with([
+                    'categoria',
+                    'colaborador.responsavel.colaborador',
+                    'historicos' => fn ($consulta) => $consulta->latest(),
+                ])
+                ->when($controle === 'colaborador' && ! $areaColaborador, fn ($consulta) => $consulta->withTrashed())
                 ->leftJoin('categorias', 'categorias.id', '=', 'justificativas.categoria_id')
-                ->where('justificativas.controle', $controle)
+                // Na área do colaborador não há filtro por etapa: são exibidas todas
+                // as justificativas ativas pertencentes ao usuário autenticado.
+                ->when(! $areaColaborador, fn ($consulta) => $consulta->where('justificativas.controle', $controle))
                 ->when($colaboradorId, fn ($consulta) => $consulta->where('justificativas.colaborador_id', $colaboradorId))
                 ->when($responsavelId !== null, fn ($consulta) => $consulta->whereHas('colaborador', fn ($colaboradores) => $colaboradores->where('responsavel_id', $responsavelId)))
                 ->select('justificativas.*');
@@ -346,13 +384,51 @@ class JustificativaController extends Controller
                 'categoria' => $registro->categoria?->nome ?? '—',
                 'data_hora_justificativa' => $this->formatarOcorrencia($registro),
                 'gestor' => $registro->colaborador?->responsavel?->colaborador?->nome ?? '—',
-                'situacao' => '<span class="badge text-bg-info">'.e(match ($registro->controle) {'colaborador' => 'Com o colaborador', 'gestao' => 'Na gestão', 'rh' => 'No RH', 'aprovado' => 'Aprovada', 'reprovado' => 'Reprovada', default => $registro->controle}).'</span>',
+                'situacao' => $areaColaborador
+                    ? $this->situacaoColaborador($registro)
+                    : '<span class="badge text-bg-info">'.e(match ($registro->controle) {'colaborador' => 'Com o colaborador', 'gestao' => 'Com o responsável', 'rh' => 'No RH', 'aprovado' => 'Aprovada', 'reprovado' => 'Reprovada', default => $registro->controle}).'</span>',
                 'atualizado_em' => $registro->updated_at?->format('d/m/Y H:i') ?? '—',
-                'acoes' => view('components.justificativa-actions', ['justificativa' => $registro, 'contexto' => $controle])->render(),
+                'acoes' => view($this->prefixoRotas() === 'justificativas_colaborador' ? 'components.justificativa-colaborador-actions' : 'components.justificativa-actions', ['justificativa' => $registro, 'contexto' => $controle])->render(),
             ]);
         }
 
         return view('justificativas.index', compact('titulo', 'descricao', 'ajaxUrl', 'controle'));
+    }
+
+    private function situacaoColaborador(Justificativa $justificativa): string
+    {
+        $rotulo = match ($justificativa->controle) {
+            'colaborador' => 'Com o colaborador',
+            'gestao' => 'Com o responsável',
+            'rh' => 'No RH',
+            'aprovado' => 'Aprovada',
+            'reprovado' => $this->origemRejeicao($justificativa),
+            default => $justificativa->controle,
+        };
+        $classe = match ($justificativa->controle) {
+            'aprovado' => 'text-bg-success',
+            'reprovado' => 'text-bg-danger',
+            'gestao', 'rh' => 'text-bg-warning',
+            default => 'text-bg-info',
+        };
+
+        return '<span class="badge '.$classe.'">'.e($rotulo).'</span>';
+    }
+
+    private function origemRejeicao(Justificativa $justificativa): string
+    {
+        $historico = $justificativa->historicos
+            ->first(fn ($evento) => str_contains(mb_strtolower((string) $evento->historico), 'rejeitad'))
+            ?->historico;
+
+        if (str_contains(mb_strtolower((string) $historico), 'gestor')) {
+            return 'Rejeitada pelo responsável';
+        }
+        if (str_contains(mb_strtolower((string) $historico), 'rh')) {
+            return 'Rejeitada pelo RH';
+        }
+
+        return 'Rejeitada';
     }
 
     private function formatarOcorrencia(Justificativa $justificativa): string

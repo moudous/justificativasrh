@@ -162,6 +162,22 @@ Route::middleware('gi.session')->prefix('responsaveis')->name('responsaveis.')->
     Route::delete('/{responsavel}', [ResponsavelController::class, 'destroy'])->middleware('gi.permission:responsaveis.excluir')->name('destroy');
 });
 
+Route::middleware(['gi.session', \App\Http\Middleware\OwnColaboradorJustificativa::class])
+    ->prefix('justificativas_colaborador')->name('justificativas_colaborador.')->group(function (): void {
+        Route::get('/', [JustificativaController::class, 'colaborador'])->middleware('gi.permission:justificativas_colaborador.listar')->name('index');
+        Route::get('/criar', [JustificativaController::class, 'create'])->middleware('gi.permission:justificativas_colaborador.criar')->name('create');
+        Route::post('/', [JustificativaController::class, 'store'])->middleware('gi.permission:justificativas_colaborador.criar')->name('store');
+        Route::get('/cids/pesquisar', [JustificativaController::class, 'pesquisarCids'])->name('cids.search');
+        Route::get('/{justificativa}/editar', [JustificativaController::class, 'edit'])->middleware('gi.permission:justificativas_colaborador.editar')->name('edit');
+        Route::put('/{justificativa}', [JustificativaController::class, 'update'])->middleware('gi.permission:justificativas_colaborador.editar')->name('update');
+        Route::get('/{justificativa}/historico', [JustificativaController::class, 'historico'])->middleware('gi.permission:justificativas_colaborador.historico')->name('historico');
+        Route::get('/{justificativa}/anexos/{anexo}', [JustificativaController::class, 'anexo'])->middleware('gi.permission:justificativas_colaborador.visualizar')->name('anexo');
+        Route::delete('/{justificativa}/anexos/{anexo}', [JustificativaController::class, 'destroyAnexo'])->middleware('gi.permission:justificativas_colaborador.editar')->name('anexos.destroy');
+        Route::patch('/{justificativa}/enviar-responsavel', [JustificativaController::class, 'enviarResponsavel'])->middleware('gi.permission:justificativas_colaborador.enviar_responsavel')->name('enviar');
+        Route::get('/{justificativa}', [JustificativaController::class, 'show'])->middleware('gi.permission:justificativas_colaborador.visualizar')->name('show');
+        Route::delete('/{justificativa}', [JustificativaController::class, 'destroy'])->middleware('gi.permission:justificativas_colaborador.excluir')->name('destroy');
+    });
+
 Route::middleware('gi.session')->prefix('justificativas')->name('justificativas.')->group(function (): void {
     Route::get('/', [JustificativaController::class, 'index'])->middleware('gi.permission:justificativa.listar')->name('index');
     Route::get('/cids/pesquisar', [JustificativaController::class, 'pesquisarCids'])->name('cids.search');

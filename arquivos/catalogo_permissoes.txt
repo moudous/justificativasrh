@@ -81,3 +81,10 @@ justificativa.gestao.rejeitar
 justificativa.rh.aprovar
 justificativa.rh.rejeitar
 justificativa.rh.devolver_gestao
+justificativas_colaborador.listar
+justificativas_colaborador.visualizar
+justificativas_colaborador.criar
+justificativas_colaborador.editar
+justificativas_colaborador.excluir
+justificativas_colaborador.historico
+justificativas_colaborador.enviar_responsavel

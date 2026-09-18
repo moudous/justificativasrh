@@ -1,4 +1,9 @@
 @extends('layouts.app')
+@php
+    $areaColaborador = request()->routeIs('justificativas_colaborador.*');
+    $prefixoRotas = $areaColaborador ? 'justificativas_colaborador' : 'justificativas';
+    $prefixoPermissoes = $areaColaborador ? 'justificativas_colaborador' : 'justificativa';
+@endphp
 
 @section('title', 'Histórico da justificativa')
 
@@ -11,5 +16,5 @@
             @empty<tr><td colspan="4" class="text-center text-muted">Nenhum evento registrado.</td></tr>@endforelse
         </tbody></table>
     </div></div></div>
-    <div class="d-flex justify-content-end mt-4">@if($giPermissoes->permite('justificativa.listar'))<a href="{{ route('justificativas.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Voltar</a>@endif</div>
+    <div class="d-flex justify-content-end mt-4">@if($giPermissoes->permite($prefixoPermissoes.'.listar'))<a href="{{ route($prefixoRotas.'.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Voltar</a>@endif</div>
 @endsection
